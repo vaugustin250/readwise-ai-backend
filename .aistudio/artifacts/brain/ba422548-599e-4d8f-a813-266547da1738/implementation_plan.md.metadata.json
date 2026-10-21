@@ -1,0 +1,6 @@
+{
+  "summary":  "Implementation plan for upgrading ReadWise AI with real-time webcam iris/gaze tracking, live speech-to-text forced word alignment, a calibrated 17-feature two-stage hybrid screening engine (1D-CNN+BiLSTM gaze sequence encoder + ETDD70-calibrated Gradient Boosted Ensemble), interactive gaze heatmaps and saccade trajectory plots, and dual Tree SHAP + LIME explainable AI.",
+  "updatedAt":  "2026-10-21T19:25:56.371235535Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

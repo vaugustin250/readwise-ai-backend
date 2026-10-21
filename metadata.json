@@ -1,0 +1,6 @@
+{
+  "name": "ReadWise AI",
+  "description": "Multimodal dyslexia-risk screening and personalized reading-support application with real-time gaze and acoustic speech telemetry, gamified cognitive drills, and SHAP explainable AI.",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

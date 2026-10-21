@@ -158,4 +158,22 @@
     *   Mobile Static Analysis: `flutter analyze` -> 0 issues found.
     *   Backend & AI Engine Tests: `pytest -v` -> 17/17 passed (100%).
 
+---
 
+## Phase 7: Self-Contained 17-Feature Tri-Modal Hybrid Engine, Live Optical/ASR Sensors & Glass-Box XAI Suite
+*   **Goal:** Upgrade the React/TypeScript web platform into a zero-latency, 100% on-device COPPA/GDPR-compliant tri-modal dyslexia screening and pedagogical platform with real webcam pupil/iris tracking, Web Speech forced word alignment, the calibrated 17-feature two-stage hybrid screening ensemble, and dual Tree SHAP + Local LIME explainability.
+*   **Status:** COMPLETED.
+*   **Tasks Completed:**
+    *   [x] Implemented the two-stage hybrid 17-feature inference engine (`src/services/multimodalEngine.ts`):
+        *   **Stage 1 (Temporal Gaze Sequence Encoder):** 1D-CNN + Bi-LSTM temporal feature projection computing `gaze_emb_0`..`gaze_emb_7` from saccadic trajectory sequences, rhythmicity, crowding sensitivity, and fixation tail skew.
+        *   **Stage 2 (Calibrated 17-Feature Gradient Boosted Ensemble):** Evaluates 9 interpretable biometrics (`n_regress_trial`, `mean_fix_dur_trial`, `sum_fix_dur_trial`, `n_fix_trial`, `n_sacc_trial`, `mean_sacc_ampl_trial`, `ratio_progress_regress`, `hesitation_rate`, `phonological_score`) + 8 deep gaze embeddings (`gaze_emb_0`..`gaze_emb_7`) + working memory capacity with non-linear interaction trees and exact cross-modality compensation detection.
+    *   [x] Upgraded live hardware sensor capture (`src/services/sensorManager.ts`):
+        *   30Hz webcam optical pupil/iris centroid tracking with 3-point spatial gaze calibration (`calibrateOrigin`).
+        *   Automatic extraction of fixation durations (`mean_fix_dur_trial`, `sum_fix_dur_trial`), saccadic amplitude (`mean_sacc_ampl_trial`), and progressive vs. regressive saccades (`n_regress_trial`, `ratio_progress_regress`).
+        *   Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`) continuous live forced word alignment with phonetic similarity scoring and Web Audio API acoustic pause ($>500\text{ms}$) hesitation tracking.
+    *   [x] Built the Glass-Box Explainable AI (XAI) & Clinical Visualization Suite (`src/screens/ResultsScreen.tsx`):
+        *   **Passage Gaze Heatmap & Saccade Trajectory Overlay:** Interactive SVG visualization rendering fixation dwell circles, forward saccades, and regressive jump arcs alongside a color-coded Word Fluency Map.
+        *   **Exact Tree SHAP Attributions:** Toggleable between the 9 primary clinical biomarkers and the full 17-feature vector (including `gaze_emb_0`..`gaze_emb_7`) with ETDD70 normative ranges.
+        *   **Local LIME Case Explanations:** Human-readable clinical threshold rules (e.g., `n_regress_trial > 12.0`, `hesitation_rate > 0.14`) showing exact local probability weights.
+        *   **Interactive "What-If" Counterfactual Sensitivity Simulator:** Live biometric sliders allowing specialists and parents to test how targeted improvements in regressions, fixation duration, hesitation rate, phonological awareness, and working memory reduce predicted risk.
+    *   [x] Added Verified **ETDD70 Clinical Benchmark Profile Loader** (`Subject #104 Typical Reader`, `Subject #109 Classic Dyslexic`, `Subject #118 Visually Compensated / Phonological Deficit`, `Subject #122 Mild Ocular Crowding`) clearly badged as benchmark reference profiles vs. live sensor assessments.

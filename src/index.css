@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #FFFDF5;
+    color: #1E1B4B;
+  }
+}
+
+/* Clay 3D tactile button effects matching the Flutter Clay3DButton */
+.clay-btn {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+}
+.clay-btn:active {
+  transform: translateY(4px);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FFFDF5;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}

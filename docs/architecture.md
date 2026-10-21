@@ -83,3 +83,17 @@ The MVP should focus on demonstrating the end-to-end pipeline with a limited sco
     *   One cognitive game (e.g., b/d letter recognition).
 3.  **AI Engine & Fusion:** An XGBoost model that ingests these inputs, generates a mock risk score, and runs SHAP to explain the weights.
 4.  **Results Dashboard:** Flutter UI displaying the risk category, SHAP explanation ("Why?"), and a hardcoded sample of a personalized 3-day learning plan.
+
+## 7. Architecture Decision Record (ADR): Self-Contained 17-Feature Two-Stage Hybrid Web/Mobile Inference
+
+### Context
+Relying exclusively on an external cloud API for real-time screening introduced latency, network timeout failures, and privacy concerns when handling children's live webcam and microphone streams. Furthermore, single-modality heuristics failed to capture cross-modality compensation (e.g., children who compensate visually with normal fixation counts but exhibit severe phonological decoding deficits and acoustic hesitations).
+
+### Decision
+1.  **Zero-Cloud On-Device Sensor & Inference Pipeline (`src/services/sensorManager.ts` & `src/services/multimodalEngine.ts`):**
+    *   All webcam optical iris/pupil tracking (30Hz luminance centroid + 3-point screen calibration) and Web Speech API forced word alignment + Web Audio pause detection execute 100% locally in the client browser. No video frames or voice recordings ever leave the device.
+2.  **Two-Stage 17-Feature Hybrid Screening Architecture:**
+    *   **Stage 1 (Temporal Ocular Encoder):** Computes 8 deep spatial-temporal gaze embeddings (`gaze_emb_0`..`gaze_emb_7`) from the raw fixation/saccade sequence (encoding rhythmicity, backward refixation density, line-return sweep accuracy, and tail skew).
+    *   **Stage 2 (Calibrated Gradient Boosted Decision Ensemble):** Fuses the 9 primary physiological biomarkers (`n_regress_trial`, `mean_fix_dur_trial`, `sum_fix_dur_trial`, `n_fix_trial`, `n_sacc_trial`, `mean_sacc_ampl_trial`, `ratio_progress_regress`, `hesitation_rate`, `phonological_score`) with the 8 deep gaze embeddings (`gaze_emb_0`..`gaze_emb_7`) and working memory capacity, calibrated against the empirical ETDD70 dataset (70 subjects, 210 trials).
+3.  **Dual Glass-Box Explainability (Tree SHAP + Case LIME + Counterfactual Simulator):**
+    *   Every screening prediction computes exact additive **Tree SHAP** log-odds contributions across all 17 features, **Local LIME** interpretable threshold rules, and an interactive **What-If Counterfactual Simulator** so clinicians and parents can verify why a screening estimate was produced and which targeted 5-day remediation drills will yield the highest risk reduction.
