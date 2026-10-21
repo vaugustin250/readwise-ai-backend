@@ -10,7 +10,10 @@ import 'screens/cognitive_game_screen.dart';
 import 'screens/results_screen.dart';
 import 'screens/learning_activity_screen.dart';
 import 'screens/progress_dashboard_screen.dart';
+import 'screens/buddy_selection_screen.dart';
 import 'services/keep_alive_service.dart';
+
+import 'services/buddy_service.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,22 +27,29 @@ class ReadWiseApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ReadWise AI',
-      theme: AppTheme.lightTheme,
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const OnboardingScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/dashboard': (context) => const ParentDashboardScreen(),
-        '/add_child': (context) => const AddChildScreen(),
-        '/assessment_selection': (context) => const AssessmentSelectionScreen(),
-        '/reading_assessment': (context) => const ReadingAssessmentScreen(),
-        '/cognitive_game': (context) => const CognitiveGameScreen(),
-        '/results': (context) => const ResultsScreen(),
-        '/learning_activity': (context) => const LearningActivityScreen(),
-        '/progress': (context) => const ProgressDashboardScreen(),
+    return AnimatedBuilder(
+      animation: BuddyService(),
+      builder: (context, _) {
+        final buddy = BuddyService().currentBuddy;
+        return MaterialApp(
+          title: 'ReadWise AI',
+          theme: AppTheme.themeFor(buddy),
+          debugShowCheckedModeBanner: false,
+          initialRoute: '/',
+          routes: {
+            '/': (context) => const OnboardingScreen(),
+            '/login': (context) => const LoginScreen(),
+            '/dashboard': (context) => const ParentDashboardScreen(),
+            '/add_child': (context) => const AddChildScreen(),
+            '/assessment_selection': (context) => const AssessmentSelectionScreen(),
+            '/buddy_select': (context) => const BuddySelectionScreen(),
+            '/reading_assessment': (context) => const ReadingAssessmentScreen(),
+            '/cognitive_game': (context) => const CognitiveGameScreen(),
+            '/results': (context) => const ResultsScreen(),
+            '/learning_activity': (context) => const LearningActivityScreen(),
+            '/progress': (context) => const ProgressDashboardScreen(),
+          },
+        );
       },
     );
   }

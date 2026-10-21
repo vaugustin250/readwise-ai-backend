@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/child_profile.dart';
 import '../services/cognitive_score_service.dart';
-import '../widgets/custom_button.dart';
+import '../services/buddy_service.dart';
+import '../widgets/clay_3d_button.dart';
+import '../widgets/buddy_mascot_bubble.dart';
 
 class CognitiveGameScreen extends StatefulWidget {
   const CognitiveGameScreen({super.key});
@@ -24,7 +26,8 @@ class _CognitiveGameScreenState extends State<CognitiveGameScreen> {
       'prompt': 'b',
       'options': ['d', 'p', 'b', 'q'],
       'correct': 'b',
-      'type': 'visual'
+      'type': 'visual',
+      'hint': 'Watch the belly direction! "b" stands tall and faces right!',
     },
     {
       'title': 'Rhyme & Phonological Match',
@@ -32,7 +35,8 @@ class _CognitiveGameScreenState extends State<CognitiveGameScreen> {
       'prompt': 'CAT',
       'options': ['BAT', 'DOG', 'PEN', 'CUP'],
       'correct': 'BAT',
-      'type': 'phonological'
+      'type': 'phonological',
+      'hint': 'Listen for the ending "-AT" sound! CAT... ?',
     },
     {
       'title': 'Letter Orientation',
@@ -40,15 +44,17 @@ class _CognitiveGameScreenState extends State<CognitiveGameScreen> {
       'prompt': 'p',
       'options': ['q', 'b', 'd', 'p'],
       'correct': 'p',
-      'type': 'visual'
+      'type': 'visual',
+      'hint': 'The tail hangs down on the left, loop on the top right!',
     },
     {
       'title': 'Phoneme Blending',
-      'instruction': 'Blend the sounds together: /s/ /u/ /n/',
+      'instruction': 'Blend the sounds together:',
       'prompt': '/s/ + /u/ + /n/',
       'options': ['SUN', 'RUN', 'FUN', 'SONG'],
       'correct': 'SUN',
-      'type': 'phonological'
+      'type': 'phonological',
+      'hint': 'Slide the sounds smoothly together: sss-uuu-nnn!',
     },
   ];
 
@@ -69,9 +75,10 @@ class _CognitiveGameScreenState extends State<CognitiveGameScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          isCorrect ? 'Correct! (${latency}ms)' : 'Keep going! Try the next one.',
+          isCorrect ? '⭐ Awesome hit! (${latency}ms)' : 'Keep going! Every practice powers your brain!',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: isCorrect ? Colors.green : Colors.orange,
+        backgroundColor: isCorrect ? const Color(0xFF059669) : const Color(0xFFEA580C),
         duration: const Duration(milliseconds: 700),
       ),
     );
@@ -115,6 +122,7 @@ class _CognitiveGameScreenState extends State<CognitiveGameScreen> {
   @override
   Widget build(BuildContext context) {
     final ChildProfile? child = ModalRoute.of(context)?.settings.arguments as ChildProfile?;
+    final activeBuddy = BuddyService().currentBuddy;
 
     if (_gameCompleted) {
       final childId = child?.id ?? '1';
@@ -122,62 +130,140 @@ class _CognitiveGameScreenState extends State<CognitiveGameScreen> {
       final ph = CognitiveScoreService().getPhonologicalAwareness(childId);
 
       return Scaffold(
-        appBar: AppBar(title: const Text('Game Completed')),
+        backgroundColor: const Color(0xFFFFFDF5),
+        appBar: AppBar(title: const Text('Quest Completed! 🏆')),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.stars_rounded, size: 80, color: Colors.amber),
-                const SizedBox(height: 16),
+                // 3D Celebratory Badge with chosen Hero
+                Center(
+                  child: Container(
+                    width: 110,
+                    height: 110,
+                    decoration: BoxDecoration(
+                      color: activeBuddy.themeSurface,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: activeBuddy.themePrimary, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: activeBuddy.themeShadow.withValues(alpha: 0.35),
+                          offset: const Offset(0, 8),
+                          blurRadius: 16,
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        activeBuddy.emoji,
+                        style: const TextStyle(fontSize: 48),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Text(
-                  'Great Effort, ${child?.name ?? "Friend"}!',
-                  style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 24),
+                  'Super Reader Level Up!',
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 26),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
-                  'Completed $_correctAnswers/${_rounds.length} challenges. Your metrics have been calibrated for your next reading assessment.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+                  '${child?.name ?? "Hero"} scored $_correctAnswers/${_rounds.length} challenges with ${activeBuddy.name}!',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w600,
+                  ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
+
+                // 3D Tactile Metric Tiles
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.indigo.shade200),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: activeBuddy.themePrimary.withValues(alpha: 0.25), width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: activeBuddy.themeShadow.withValues(alpha: 0.12),
+                        offset: const Offset(0, 6),
+                        blurRadius: 12,
+                      ),
+                    ],
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Column(
                         children: [
-                          const Text('Working Memory', style: TextStyle(fontSize: 12, color: Colors.indigo)),
+                          Text(
+                            'Working Memory',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: activeBuddy.textColor,
+                            ),
+                          ),
                           const SizedBox(height: 6),
-                          Text('$wm / 100', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.indigo)),
+                          Text(
+                            '$wm',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: activeBuddy.themePrimary,
+                            ),
+                          ),
+                          Text(
+                            'pts',
+                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.bold),
+                          ),
                         ],
                       ),
-                      Container(width: 1, height: 40, color: Colors.indigo.shade200),
+                      Container(width: 2, height: 50, color: const Color(0xFFE2E8F0)),
                       Column(
                         children: [
-                          const Text('Phonological Score', style: TextStyle(fontSize: 12, color: Colors.indigo)),
+                          Text(
+                            'Phonology Power',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: activeBuddy.textColor,
+                            ),
+                          ),
                           const SizedBox(height: 6),
-                          Text('$ph / 100', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.indigo)),
+                          Text(
+                            '$ph',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: activeBuddy.themeSecondary,
+                            ),
+                          ),
+                          Text(
+                            'pts',
+                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.bold),
+                          ),
                         ],
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
-                CustomButton(
-                  text: 'Return to Activity Hub',
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                const SizedBox(height: 36),
+
+                Clay3DButton(
+                  text: 'Return to Adventure Hub 🚀',
+                  isExpanded: true,
+                  color: activeBuddy.themePrimary,
+                  shadowColor: activeBuddy.themeShadow,
+                  depth: 6.0,
+                  fontSize: 17.0,
+                  onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
@@ -189,71 +275,125 @@ class _CognitiveGameScreenState extends State<CognitiveGameScreen> {
     final roundData = _rounds[_currentRound];
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFDF5),
       appBar: AppBar(
-        title: Text('Cognitive Game (${_currentRound + 1}/${_rounds.length})'),
+        title: Text('Arcade Drill (${_currentRound + 1}/${_rounds.length})'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: activeBuddy.themeSurface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: activeBuddy.themePrimary, width: 1.5),
+                ),
+                child: Text(
+                  '⭐ $_correctAnswers Points',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                    color: activeBuddy.textColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Mascot Hint Bubble
+              BuddyMascotBubble(
+                message: '${activeBuddy.name}: "${roundData['hint']}"',
+                onBuddyTap: () async {
+                  await Navigator.pushNamed(context, '/buddy_select');
+                  if (mounted) setState(() {});
+                },
+              ),
+              const SizedBox(height: 16),
+
               Text(
-                roundData['title'],
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey),
+                roundData['title'].toUpperCase(),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.0,
+                  color: activeBuddy.themePrimary,
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
                 roundData['instruction'],
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1E1B4B),
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
+
+              // 3D Giant Prompt Crucible Card
               Container(
-                padding: const EdgeInsets.all(28),
+                padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
-                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(color: activeBuddy.themePrimary.withValues(alpha: 0.35), width: 3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: activeBuddy.themeShadow.withValues(alpha: 0.18),
+                      offset: const Offset(0, 8),
+                      blurRadius: 16,
+                    ),
+                  ],
                 ),
                 child: Center(
                   child: Text(
                     roundData['prompt'],
                     style: TextStyle(
-                      fontSize: 64,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
+                      fontSize: 56,
+                      fontWeight: FontWeight.w900,
+                      color: activeBuddy.themePrimary,
+                      letterSpacing: 3.0,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 48),
+
+              const Spacer(),
+
+              // 3D Tactile Push-Down Answer Blocks
               Wrap(
                 spacing: 16,
-                runSpacing: 16,
+                runSpacing: 18,
                 alignment: WrapAlignment.center,
                 children: (roundData['options'] as List<String>).map((opt) {
                   return SizedBox(
-                    width: 130,
-                    height: 70,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        backgroundColor: Colors.white,
-                        foregroundColor: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor, width: 2),
-                        elevation: 2,
-                      ),
+                    width: 140,
+                    height: 72,
+                    child: Clay3DButton(
+                      text: opt,
+                      fontSize: 26,
+                      color: Colors.white,
+                      shadowColor: activeBuddy.themeShadow.withValues(alpha: 0.7),
+                      textColor: activeBuddy.textColor,
+                      depth: 5.5,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       onPressed: () => _handleOptionSelected(opt, child),
-                      child: Text(
-                        opt,
-                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                      ),
                     ),
                   );
                 }).toList(),
               ),
+
+              const Spacer(),
             ],
           ),
         ),

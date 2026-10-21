@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'clay_3d_button.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -14,17 +15,18 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isSecondary ? Colors.white : Theme.of(context).primaryColor,
-          foregroundColor: isSecondary ? Theme.of(context).primaryColor : Colors.white,
-          side: isSecondary ? BorderSide(color: Theme.of(context).primaryColor, width: 2) : null,
-        ),
-        onPressed: onPressed,
-        child: Text(text),
-      ),
+    final primary = Theme.of(context).primaryColor;
+    return Clay3DButton(
+      text: text,
+      onPressed: onPressed,
+      isExpanded: true,
+      color: isSecondary ? Colors.white : primary,
+      shadowColor: isSecondary
+          ? const Color(0xFFCBD5E1)
+          : (Theme.of(context).colorScheme.primary.withValues(alpha: 0.8)),
+      textColor: isSecondary ? primary : Colors.white,
+      depth: 5.0,
+      fontSize: 16.0,
     );
   }
 }

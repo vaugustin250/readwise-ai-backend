@@ -4,7 +4,9 @@ import '../models/child_profile.dart';
 import '../repositories/assessment_service.dart';
 import '../services/cognitive_score_service.dart';
 import '../services/sensor_manager.dart';
-import '../widgets/custom_button.dart';
+import '../services/buddy_service.dart';
+import '../widgets/clay_3d_button.dart';
+import '../widgets/buddy_mascot_bubble.dart';
 import '../widgets/parental_consent_dialog.dart';
 
 class ReadingAssessmentScreen extends StatefulWidget {
@@ -188,9 +190,12 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
         ? routeArgs
         : (routeArgs is Map ? routeArgs['child'] as ChildProfile? : null);
 
+    final activeBuddy = BuddyService().currentBuddy;
+
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFDF5), // Warm glare-free dyslexia canvas
       appBar: AppBar(
-        title: Text(child != null ? '${child.name}\'s Reading Trial' : 'Reading Assessment'),
+        title: Text(child != null ? '${child.name}’s Reading Trial' : 'Reading Assessment'),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 16),
@@ -226,21 +231,39 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // 3D Buddy Mascot Guidance Bubble
+              BuddyMascotBubble(
+                message: _isRecording
+                    ? '${activeBuddy.name}: "Read at your own pace! I\'m listening and watching with you!"'
+                    : '${activeBuddy.name}: "${activeBuddy.tagline}"',
+                onBuddyTap: () async {
+                  await Navigator.pushNamed(context, '/buddy_select');
+                  if (mounted) setState(() {});
+                },
+              ),
+              const SizedBox(height: 10),
+
               // Live Multimodal Sensor HUD Bar (Camera View + Mic Meter)
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                  borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: _isRecording ? Colors.green.shade400 : Colors.grey.shade300,
-                    width: _isRecording ? 2 : 1,
+                    color: _isRecording ? activeBuddy.themePrimary : const Color(0xFFE2E8F0),
+                    width: _isRecording ? 2.5 : 1.5,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: activeBuddy.themeShadow.withValues(alpha: 0.12),
+                      offset: const Offset(0, 4),
+                      blurRadius: 8,
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -248,8 +271,8 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(14),
                       child: Container(
-                        width: 120,
-                        height: 90,
+                        width: 110,
+                        height: 82,
                         color: Colors.black,
                         child: Stack(
                           fit: StackFit.expand,
@@ -355,7 +378,7 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 12),
 
                     // Real-Time Sensor Telemetry & Audio VU Indicator
                     Expanded(
@@ -370,15 +393,15 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                                   Icon(
                                     _currentAudioLevel > 0.10 ? Icons.mic : Icons.mic_none,
                                     size: 16,
-                                    color: _currentAudioLevel > 0.10 ? Colors.green : Colors.grey,
+                                    color: _currentAudioLevel > 0.10 ? const Color(0xFF059669) : Colors.grey,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    _currentAudioLevel > 0.10 ? 'Speaking...' : 'Acoustic VU',
+                                    _currentAudioLevel > 0.10 ? 'Speaking...' : 'Acoustic Voice VU',
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
-                                      color: _currentAudioLevel > 0.10 ? Colors.green.shade700 : Colors.grey.shade700,
+                                      color: _currentAudioLevel > 0.10 ? const Color(0xFF064E3B) : const Color(0xFF475569),
                                     ),
                                   ),
                                 ],
@@ -388,22 +411,22 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: _currentAudioLevel > 0.10 ? Colors.green.shade800 : Colors.grey,
+                                  color: _currentAudioLevel > 0.10 ? const Color(0xFF059669) : Colors.grey,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 6),
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(6),
                             child: LinearProgressIndicator(
                               value: _isRecording ? _currentAudioLevel : 0.0,
-                              backgroundColor: Colors.grey.shade200,
-                              color: _currentAudioLevel > 0.45 ? Colors.orange : Colors.tealAccent.shade700,
+                              backgroundColor: const Color(0xFFF1F5F9),
+                              color: _currentAudioLevel > 0.45 ? activeBuddy.themeSecondary : activeBuddy.themePrimary,
                               minHeight: 8,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -412,23 +435,27 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: _sensorManager.regressionCount > 0 ? Colors.deepOrange : Colors.black87,
+                                  color: _sensorManager.regressionCount > 0 ? const Color(0xFFEA580C) : const Color(0xFF1E1B4B),
                                 ),
                               ),
                               Text(
-                                'Timer: ${_secondsElapsed ~/ 60}:${(_secondsElapsed % 60).toString().padLeft(2, '0')}',
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.indigo),
+                                '⏱ ${_secondsElapsed ~/ 60}:${(_secondsElapsed % 60).toString().padLeft(2, '0')}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: activeBuddy.themePrimary,
+                                ),
                               ),
                             ],
                           ),
                           if (_lastRegressionAlert.isNotEmpty) ...[
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 3),
                             Text(
                               _lastRegressionAlert,
                               style: const TextStyle(
-                                fontSize: 9,
-                                color: Colors.deepOrange,
-                                fontStyle: FontStyle.italic,
+                                fontSize: 9.5,
+                                color: Color(0xFFEA580C),
+                                fontWeight: FontWeight.bold,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -441,17 +468,22 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                 ),
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: 10),
 
-              // Dyslexia-Friendly Reading Passage with Interactive Word Highlighter
+              // Dyslexia-Friendly Reading Passage Card with 3D Word Highlighter
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4)),
+                    color: const Color(0xFFFFFDF5), // Warm scotopic cream
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: activeBuddy.themePrimary.withValues(alpha: 0.25), width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: activeBuddy.themeShadow.withValues(alpha: 0.1),
+                        offset: const Offset(0, 5),
+                        blurRadius: 10,
+                      ),
                     ],
                   ),
                   child: Column(
@@ -460,27 +492,38 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Trial: The Brave Little Squirrel',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey),
+                          Row(
+                            children: [
+                              Text(activeBuddy.emoji, style: const TextStyle(fontSize: 16)),
+                              const SizedBox(width: 6),
+                              const Text(
+                                'The Brave Little Squirrel',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF1E1B4B),
+                                ),
+                              ),
+                            ],
                           ),
                           if (_isRecording)
-                            ElevatedButton.icon(
+                            Clay3DButton(
+                              text: 'Next ➔',
                               onPressed: _advanceWord,
-                              icon: const Icon(Icons.arrow_forward, size: 14),
-                              label: const Text('Next Word', style: TextStyle(fontSize: 11)),
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                visualDensity: VisualDensity.compact,
-                              ),
+                              color: activeBuddy.themeSecondary,
+                              shadowColor: activeBuddy.themeShadow,
+                              textColor: const Color(0xFF1E1B4B),
+                              depth: 3.5,
+                              fontSize: 12,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             ),
                         ],
                       ),
-                      const Divider(height: 16),
+                      const Divider(height: 14, color: Color(0xFFE2E8F0)),
                       Expanded(
                         child: SingleChildScrollView(
                           child: Wrap(
-                            spacing: 6.0,
+                            spacing: 8.0,
                             runSpacing: 10.0,
                             children: List.generate(_passageWords.length, (i) {
                               final word = _passageWords[i];
@@ -489,16 +532,29 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
 
                               return InkWell(
                                 onTap: () => _onWordTapped(i),
-                                borderRadius: BorderRadius.circular(6),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                borderRadius: BorderRadius.circular(10),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: isCurrent
-                                        ? Colors.amber.shade200
-                                        : (isCompleted ? Colors.blue.shade50 : Colors.transparent),
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: isCurrent
-                                        ? Border.all(color: Colors.amber.shade700, width: 1.5)
+                                        ? activeBuddy.themeSecondary
+                                        : (isCompleted ? activeBuddy.themeSurface : Colors.white),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: isCurrent
+                                          ? activeBuddy.themeShadow
+                                          : (isCompleted ? activeBuddy.themePrimary.withValues(alpha: 0.3) : const Color(0xFFE2E8F0)),
+                                      width: isCurrent ? 2.0 : 1.0,
+                                    ),
+                                    boxShadow: isCurrent
+                                        ? [
+                                            BoxShadow(
+                                              color: activeBuddy.themeShadow.withValues(alpha: 0.4),
+                                              offset: const Offset(0, 3),
+                                              blurRadius: 0,
+                                            ),
+                                          ]
                                         : null,
                                   ),
                                   child: Text(
@@ -506,9 +562,9 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                                     style: TextStyle(
                                       fontSize: 20,
                                       height: 1.6,
-                                      fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
-                                      letterSpacing: 0.8,
-                                      color: isCurrent ? Colors.black : const Color(0xFF2C3E50),
+                                      fontWeight: isCurrent ? FontWeight.w900 : FontWeight.w600,
+                                      letterSpacing: 0.7,
+                                      color: isCurrent ? const Color(0xFF1E1B4B) : const Color(0xFF1E1B4B),
                                     ),
                                   ),
                                 ),
@@ -517,21 +573,22 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.touch_app_outlined, size: 14, color: Colors.grey),
+                            Icon(Icons.touch_app_outlined, size: 14, color: activeBuddy.themePrimary),
                             const SizedBox(width: 6),
-                            const Expanded(
+                            Expanded(
                               child: Text(
-                                'Tap words as read. Tapping backwards records an ocular regression.',
-                                style: TextStyle(fontSize: 10, color: Colors.grey),
+                                'Tap words as you read. Reading backwards automatically logs eye saccades.',
+                                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
                               ),
                             ),
                           ],
@@ -542,27 +599,30 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                 ),
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: 10),
 
               // Analysis Loading Overlay
               if (_isAnalyzing)
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.indigo.shade200),
+                    color: activeBuddy.themeSurface,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: activeBuddy.themePrimary, width: 2),
                   ),
                   child: Column(
                     children: [
-                      const LinearProgressIndicator(),
+                      LinearProgressIndicator(
+                        backgroundColor: Colors.white,
+                        color: activeBuddy.themePrimary,
+                      ),
                       const SizedBox(height: 10),
                       Text(
                         _analysisStatus,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.indigo.shade900,
+                          fontWeight: FontWeight.w800,
+                          color: activeBuddy.textColor,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -570,12 +630,15 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                   ),
                 ),
 
-              const SizedBox(height: 12),
-
-              // Action Trigger Button
+              // Action Trigger 3D Button
               if (!_isAnalyzing)
-                CustomButton(
-                  text: _isRecording ? 'Finish Reading & Analyze With AI' : 'Start Reading Session (Turn On Sensors)',
+                Clay3DButton(
+                  text: _isRecording ? 'Finish Reading & Analyze With AI ⭐' : 'Start Reading Session 🚀',
+                  isExpanded: true,
+                  color: _isRecording ? const Color(0xFF059669) : activeBuddy.themePrimary,
+                  shadowColor: _isRecording ? const Color(0xFF064E3B) : activeBuddy.themeShadow,
+                  depth: 6.0,
+                  fontSize: 17.0,
                   onPressed: () {
                     if (_isRecording) {
                       _finishReading(child);
@@ -597,7 +660,6 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
                       }
                     }
                   },
-                  isSecondary: _isRecording,
                 ),
             ],
           ),
