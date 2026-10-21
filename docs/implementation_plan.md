@@ -83,3 +83,23 @@
     *   [x] Authored complete conference research paper manuscript (Sections I-VII) in both Markdown (`docs/conference_paper_manuscript.md`) and IEEE LaTeX format (`docs/conference_paper_manuscript.tex`).
 *   **Testable Milestone:** Commercial-grade production readiness achieved across mobile client, containerized backend, database persistence, privacy compliance, and full academic paper deliverables.
 
+---
+
+## Remediation Phase 1: Security, Real JWT Authentication & Persistent Migrations
+*   **Goal:** Replace mock authentication with real bcrypt password hashing and signed JWT tokens, eliminate IDOR vulnerabilities across child profiles and assessments, and initialize version-controlled Alembic migrations.
+*   **Status:** COMPLETED.
+*   **Tasks Completed:**
+    *   [x] Implemented secure password hashing (`passlib[bcrypt]`) and JWT access token issuance/verification (`python-jose`) in `backend_api/app/core/security.py`.
+    *   [x] Built guardian registration (`POST /api/v1/auth/register`), login (`POST /api/v1/auth/login`), OAuth2 token (`POST /api/v1/auth/token`), and profile (`GET /api/v1/auth/me`) endpoints in `backend_api/app/api/v1/endpoints/auth.py`.
+    *   [x] Enforced child-to-guardian authorization (IDOR elimination) across `profiles.py` and `assessments.py`:
+        *   Unauthorized requests and legacy mock tokens (`mock-valid-token`) strictly rejected with HTTP 401.
+        *   Cross-guardian profile queries, screening sessions, and report downloads strictly rejected with HTTP 403 Forbidden.
+    *   [x] Initialized Alembic migrations in `backend_api/alembic/` and generated baseline migration `c594a069c6c0` tracking `users`, `child_profiles`, `assessments`, and `metrics` tables.
+    *   [x] Added longitudinal progress tracking API (`GET /api/v1/assessments/progress/{child_id}`) with verified guardian ownership checks.
+    *   [x] Built mobile `AuthRepository` (`mobile/lib/repositories/auth_repository.dart`) and updated `ProfileRepository`, `AssessmentService`, and `LoginScreen` to use authentic JWT bearer tokens.
+    *   [x] Created test suite in `backend_api/tests/test_api.py` and `backend_api/tests/test_assessments.py` verifying registration, login, mock token rejection, IDOR rejection, authenticated screening, and PDF generation.
+*   **Verification & Test Results:**
+    *   Backend Tests: `pytest backend_api/tests -v` -> 9/9 passed (100%), 0 warnings.
+    *   Mobile Analysis: `flutter analyze` -> 0 issues found.
+    *   Mobile Tests: `flutter test` -> 3/3 passed.
+

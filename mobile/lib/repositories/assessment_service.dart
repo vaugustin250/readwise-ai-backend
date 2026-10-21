@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/assessment_result.dart';
+import 'auth_repository.dart';
 
 class AssessmentService {
   static final AssessmentService _instance = AssessmentService._internal();
@@ -40,11 +41,19 @@ class AssessmentService {
       'phonological_awareness_score': phonologicalAwarenessScore,
     };
 
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+    };
+    final token = AuthRepository().authToken;
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
     try {
       final response = await http
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: headers,
             body: jsonEncode(payload),
           )
           .timeout(const Duration(seconds: 25));
@@ -62,7 +71,7 @@ class AssessmentService {
     }
   }
 
-  /// Generates the direct URL for downloading the automated PDF report
+  /// Generates the direct URL for downloading the automated PDF report with authentication token
   String getReportUrl({
     required int childId,
     String name = 'Child',
@@ -70,7 +79,9 @@ class AssessmentService {
     String grade = 'Grade 4',
     double riskProb = 0.75,
   }) {
-    return '$baseUrl/api/v1/assessments/report/$childId?name=${Uri.encodeComponent(name)}&age=$age&grade=${Uri.encodeComponent(grade)}&risk_prob=$riskProb';
+    final token = AuthRepository().authToken;
+    final tokenParam = (token != null && token.isNotEmpty) ? '&token=$token' : '';
+    return '$baseUrl/api/v1/assessments/report/$childId?name=${Uri.encodeComponent(name)}&age=$age&grade=${Uri.encodeComponent(grade)}&risk_prob=$riskProb$tokenParam';
   }
 
   /// Offline calibrated screener in case the phone is temporarily disconnected from server

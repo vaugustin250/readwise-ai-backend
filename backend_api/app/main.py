@@ -15,8 +15,9 @@ from app.api.v1.api import api_router
 from app.core.config import settings
 from app.core.database import Base, engine
 
-# Create tables for dev/testing (In prod, use Alembic)
-Base.metadata.create_all(bind=engine)
+# Create tables for dev/testing (In production, use Alembic migrations)
+if settings.ENVIRONMENT != "production":
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.PROJECT_NAME)
 

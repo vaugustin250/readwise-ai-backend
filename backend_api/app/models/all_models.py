@@ -11,6 +11,11 @@ class User(Base):
     role = Column(String, default="parent")
     profiles = relationship("ChildProfile", back_populates="owner")
 
+    def __getitem__(self, item):
+        if item == "user_id":
+            return self.id
+        return getattr(self, item)
+
 class ChildProfile(Base):
     __tablename__ = "child_profiles"
     id = Column(Integer, primary_key=True, index=True)
