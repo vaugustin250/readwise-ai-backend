@@ -3,12 +3,12 @@ services:
     name: readwise-ai-backend
     runtime: python
     buildCommand: pip install -r backend_api/requirements.txt
-    startCommand: uvicorn backend_api.app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd backend_api && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.11
       - key: PYTHONPATH
-        value: .
+        value: .:backend_api
       - key: ENVIRONMENT
         value: production
       - key: SECRET_KEY
