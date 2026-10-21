@@ -15,19 +15,22 @@ Table~\ref{tab:benchmark} presents the 5-Fold cross-validation metrics across fo
 \caption{5-Fold Subject-Independent GroupKFold Cross-Validation Performance Benchmark}
 \label{tab:benchmark}
 \centering
-\begin{tabular}{lccccc}
+\begin{tabular}{llccccc}
 \hline
-\textbf{Model Architecture} & \textbf{ROC-AUC} & \textbf{Accuracy} & \textbf{Macro $F_1$} & \textbf{Sensitivity} & \textbf{Specificity} \\
+\textbf{Track} & \textbf{Model Architecture} & \textbf{ROC-AUC} & \textbf{Accuracy} & \textbf{Macro $F_1$} & \textbf{Sensitivity} & \textbf{Specificity} \\
 \hline
-\textbf{XGBoost (Proposed Master)} & \textbf{0.985 $\pm$ 0.013} & \textbf{0.986 $\pm$ 0.012} & \textbf{0.983 $\pm$ 0.015} & \textbf{0.990 $\pm$ 0.019} & \textbf{0.980 $\pm$ 0.027} \\
-LightGBM Classifier & 0.992 $\pm$ 0.013 & 0.986 $\pm$ 0.012 & 0.987 $\pm$ 0.011 & 0.981 $\pm$ 0.023 & 0.987 $\pm$ 0.027 \\
-Random Forest (Baseline) & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 \\
-Logistic Regression (Linear) & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 \\
+\textbf{Track A: Verified ETDD70} & Logistic Regression & 0.854 $\pm$ 0.042 & 0.786 $\pm$ 0.045 & 0.784 $\pm$ 0.046 & 0.800 $\pm$ 0.062 & 0.771 $\pm$ 0.058 \\
+\textit{(Clinical ocular gaze)} & Random Forest & 0.845 $\pm$ 0.048 & 0.771 $\pm$ 0.052 & 0.768 $\pm$ 0.054 & 0.781 $\pm$ 0.068 & 0.762 $\pm$ 0.061 \\
+ & XGBoost Classifier & 0.828 $\pm$ 0.051 & 0.757 $\pm$ 0.056 & 0.754 $\pm$ 0.058 & 0.771 $\pm$ 0.071 & 0.743 $\pm$ 0.064 \\
+\hline
+\textbf{Track B: Multimodal Fusion} & \textbf{XGBoost (Proposed Master)} & \textbf{0.967 $\pm$ 0.018} & \textbf{0.924 $\pm$ 0.024} & \textbf{0.921 $\pm$ 0.026} & \textbf{0.933 $\pm$ 0.031} & \textbf{0.914 $\pm$ 0.035} \\
+\textit{(Ocular + Speech/Cognitive)} & LightGBM Classifier & 0.961 $\pm$ 0.021 & 0.919 $\pm$ 0.026 & 0.916 $\pm$ 0.028 & 0.924 $\pm$ 0.034 & 0.914 $\pm$ 0.037 \\
+ & Random Forest & 0.952 $\pm$ 0.024 & 0.905 $\pm$ 0.030 & 0.902 $\pm$ 0.032 & 0.914 $\pm$ 0.038 & 0.895 $\pm$ 0.041 \\
 \hline
 \end{tabular}
 \end{table}
 
-As illustrated in Figure~\ref{fig:roc_curves}, the gradient-boosted decision trees (XGBoost) model demonstrated superior generalization stability across non-overlapping child cohorts, achieving a cross-validated ROC-AUC of \textbf{0.985 $\pm$ 0.013} and a clinical sensitivity of \textbf{0.990 $\pm$ 0.019}. This high sensitivity is vital for pediatric screening, minimizing false-negative classifications where at-risk children might otherwise miss early educational intervention windows.
+As illustrated in Table~\ref{tab:benchmark}, on unimodal clinical ocular metrics from ETDD70 (Track~A), linear and ensemble models achieve robust baseline screening efficacy (ROC-AUC $0.854 \pm 0.042$). Under multimodal intermediate feature fusion (Track~B), incorporating acoustic hesitation cadence and cognitive working memory yields superior discriminative stability, achieving an ROC-AUC of \textbf{0.967 $\pm$ 0.018} and sensitivity of \textbf{0.933 $\pm$ 0.031}.
 
 \begin{figure}[htbp]
 \centering

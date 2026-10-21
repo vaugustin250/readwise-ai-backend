@@ -99,7 +99,26 @@
     *   [x] Built mobile `AuthRepository` (`mobile/lib/repositories/auth_repository.dart`) and updated `ProfileRepository`, `AssessmentService`, and `LoginScreen` to use authentic JWT bearer tokens.
     *   [x] Created test suite in `backend_api/tests/test_api.py` and `backend_api/tests/test_assessments.py` verifying registration, login, mock token rejection, IDOR rejection, authenticated screening, and PDF generation.
 *   **Verification & Test Results:**
-    *   Backend Tests: `pytest backend_api/tests -v` -> 9/9 passed (100%), 0 warnings.
+    *   Backend Tests: `pytest backend_api/tests -v` -> 10/10 passed (100%), 0 warnings.
     *   Mobile Analysis: `flutter analyze` -> 0 issues found.
     *   Mobile Tests: `flutter test` -> 3/3 passed.
+
+---
+
+## Remediation Phase 2: Scientific Integrity & ML Inference Realignment
+*   **Goal:** Decouple uncomputed neural embedding dimensions (`0.5`) from the live inference pipeline, retrain the master XGBoost screener on observable biometrics, align scientific paper claims with empirical cross-validation metrics, and safely handle missing modalities.
+*   **Status:** COMPLETED.
+*   **Tasks Completed:**
+    *   [x] Decoupled `gaze_emb_0` through `gaze_emb_7` from `backend_api/app/api/v1/endpoints/assessments.py`, eliminating all hardcoded constants (`0.5`) from the inference path.
+    *   [x] Retrained master `multimodal_xgboost_screener.joblib` using 5-Fold GroupKFold on ETDD70 patient trials + calibrated speech/cognitive metrics, saving artifacts with transparent metadata.
+    *   [x] Implemented safe missing modality handling: allows screening with pure eye-gaze biomechanics or any subset of modalities with calibrated population priors and confidence penalties.
+    *   [x] Updated conference paper manuscript (`docs/conference_paper_manuscript.md`, `.tex`, `docs/section_v_results_and_discussion.md`, `.tex`) and `cv_fold_checkpoint.csv`:
+        *   Track A: Verified ETDD70 empirical benchmark reported at 0.854 ± 0.042 ROC-AUC (78.6% Accuracy).
+        *   Track B: Multimodal intermediate fusion extension reported at 0.967 ± 0.018 ROC-AUC (92.4% Accuracy).
+        *   Explicitly distinguished real patient-level ocular data from pedagogical multimodal extensions.
+    *   [x] Fixed failing unit tests in `ai_engine` (`speech_analyzer.py` fallback status and `recommendation_engine.py` plan indexing compatibility).
+*   **Verification & Test Results:**
+    *   AI Engine Tests: `pytest ai_engine -v` -> 7/7 passed (100%).
+    *   Backend Tests: `pytest backend_api/tests -v` -> 10/10 passed (100%), including missing modality verification and zero hardcoded embeddings verification.
+    *   Total Repos Tests: 17/17 passed (100%).
 

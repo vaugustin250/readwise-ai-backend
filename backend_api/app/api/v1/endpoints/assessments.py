@@ -113,10 +113,10 @@ class AssessmentScreenRequest(BaseModel):
     mean_fix_dur_trial: float = Field(default=450.0, description="Mean fixation duration in ms")
     ratio_progress_regress_trial: float = Field(default=6.5, description="Ratio of progressive to regressive saccades")
     mean_sacc_ampl_trial: float = Field(default=90.0, description="Mean saccadic amplitude in px")
-    speech_hesitation_rate: float = Field(default=2.1, description="Speech hesitations >500ms per minute")
-    speech_phoneme_stability: float = Field(default=0.6, description="Acoustic phoneme decoding stability (-1 to 1)")
-    cognitive_working_memory: float = Field(default=80.0, description="Visual/auditory working memory score (0-100)")
-    phonological_awareness_score: float = Field(default=82.0, description="Phoneme sound-blending score (0-100)")
+    speech_hesitation_rate: Optional[float] = Field(default=2.1, description="Speech hesitations >500ms per minute")
+    speech_phoneme_stability: Optional[float] = Field(default=0.6, description="Acoustic phoneme decoding stability (-1 to 1)")
+    cognitive_working_memory: Optional[float] = Field(default=80.0, description="Visual/auditory working memory score (0-100)")
+    phonological_awareness_score: Optional[float] = Field(default=82.0, description="Phoneme sound-blending score (0-100)")
 
 class AssessmentScreenResponse(BaseModel):
     child_id: int
@@ -148,6 +148,7 @@ def screen_child_assessment(
     
     Enforces child-to-guardian authorization (IDOR protection), evaluates multimodal features,
     generates transparent SHAP values and tailored intervention activities, and persists results.
+    Handles missing speech or cognitive modalities safely via calibrated population priors.
     """
     # 1. Enforce child profile ownership
     profile = db.query(ChildProfile).filter(ChildProfile.id == request.child_id).first()
@@ -165,22 +166,40 @@ def screen_child_assessment(
     artifact, feats = get_screener()
     rec_engine = RecommendationEngine()
     
-    # Construct feature dictionary
+    # Missing modality handling with confidence penalty
+    missing_modalities = 0
+    speech_hesitation = request.speech_hesitation_rate
+    if speech_hesitation is None:
+        speech_hesitation = 2.1
+        missing_modalities += 1
+
+    speech_stability = request.speech_phoneme_stability
+    if speech_stability is None:
+        speech_stability = 0.6
+        missing_modalities += 1
+
+    cog_memory = request.cognitive_working_memory
+    if cog_memory is None:
+        cog_memory = 80.0
+        missing_modalities += 1
+
+    phono_score = request.phonological_awareness_score
+    if phono_score is None:
+        phono_score = 82.0
+        missing_modalities += 1
+
+    # Construct feature dictionary strictly on observable metrics (zero hardcoded embeddings)
     input_data = {
         "dwell_time_trial": request.dwell_time_trial,
         "n_regress_trial": request.n_regress_trial,
         "mean_fix_dur_trial": request.mean_fix_dur_trial,
         "ratio_progress_regress_trial": request.ratio_progress_regress_trial,
         "mean_sacc_ampl_trial": request.mean_sacc_ampl_trial,
-        "speech_hesitation_rate": request.speech_hesitation_rate,
-        "speech_phoneme_stability": request.speech_phoneme_stability,
-        "cognitive_working_memory": request.cognitive_working_memory,
-        "phonological_awareness_score": request.phonological_awareness_score,
+        "speech_hesitation_rate": speech_hesitation,
+        "speech_phoneme_stability": speech_stability,
+        "cognitive_working_memory": cog_memory,
+        "phonological_awareness_score": phono_score,
     }
-    
-    # Fill in gaze deep latent embeddings (gaze_emb_0 to gaze_emb_7)
-    for i in range(8):
-        input_data[f"gaze_emb_{i}"] = 0.5
 
     # Run model prediction if loaded
     if artifact:
@@ -195,23 +214,27 @@ def screen_child_assessment(
         shap_dict = {feat: round(float(contribs[0, idx]), 4) for idx, feat in enumerate(feats)}
     else:
         # Fallback calibrated estimate
-        prob = 0.25 if request.n_regress_trial < 20 and request.speech_hesitation_rate < 3.0 else 0.72
+        prob = 0.25 if request.n_regress_trial < 20 and speech_hesitation < 3.0 else 0.72
         shap_dict = {
             "n_regress_trial": 0.08 if request.n_regress_trial > 20 else -0.05,
-            "speech_hesitation_rate": 0.12 if request.speech_hesitation_rate > 3.0 else -0.04,
-            "phonological_awareness_score": 0.10 if request.phonological_awareness_score < 65 else -0.06
+            "speech_hesitation_rate": 0.12 if speech_hesitation > 3.0 else -0.04,
+            "phonological_awareness_score": 0.10 if phono_score < 65 else -0.06
         }
 
     # Categorize screening level
     if prob >= 0.70:
         level = "High Dyslexia Risk Indicator"
-        conf = round(prob, 3)
+        raw_conf = prob
     elif prob >= 0.40:
         level = "Moderate Dyslexia Risk Indicator"
-        conf = round(max(prob, 1.0 - prob), 3)
+        raw_conf = max(prob, 1.0 - prob)
     else:
         level = "Low Risk / Typical Reader Profile"
-        conf = round(1.0 - prob, 3)
+        raw_conf = 1.0 - prob
+
+    # Confidence penalty for unmeasured modalities
+    confidence_penalty = missing_modalities * 0.08
+    conf = round(max(0.50, raw_conf - confidence_penalty), 3)
 
     # Generate personalized learning plan
     plan = rec_engine.generate_plan(risk_score=prob, shap_explanation=shap_dict, metrics=input_data)

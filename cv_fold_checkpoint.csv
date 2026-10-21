@@ -1,0 +1,7 @@
+Track,Model,ROC-AUC,Accuracy,Macro F1-Score,Sensitivity,Specificity
+Track A (ETDD70 Ocular Benchmark),Logistic Regression,0.854 +/- 0.042,0.786 +/- 0.045,0.784 +/- 0.046,0.800 +/- 0.062,0.771 +/- 0.058
+Track A (ETDD70 Ocular Benchmark),Random Forest,0.845 +/- 0.048,0.771 +/- 0.052,0.768 +/- 0.054,0.781 +/- 0.068,0.762 +/- 0.061
+Track A (ETDD70 Ocular Benchmark),XGBoost Classifier,0.828 +/- 0.051,0.757 +/- 0.056,0.754 +/- 0.058,0.771 +/- 0.071,0.743 +/- 0.064
+Track B (Multimodal Fusion Extension),XGBoost (Proposed Master),0.967 +/- 0.018,0.924 +/- 0.024,0.921 +/- 0.026,0.933 +/- 0.031,0.914 +/- 0.035
+Track B (Multimodal Fusion Extension),LightGBM Classifier,0.961 +/- 0.021,0.919 +/- 0.026,0.916 +/- 0.028,0.924 +/- 0.034,0.914 +/- 0.037
+Track B (Multimodal Fusion Extension),Random Forest,0.952 +/- 0.024,0.905 +/- 0.030,0.902 +/- 0.032,0.914 +/- 0.038,0.895 +/- 0.041

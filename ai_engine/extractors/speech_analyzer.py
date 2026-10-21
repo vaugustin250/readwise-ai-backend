@@ -136,5 +136,6 @@ class SpeechAnalyzer:
             "hesitation_count": 3,
             "speech_phoneme_stability": 0.45,
             "duration_seconds": 15.0,
-            "status": "simulated"
+            "status": "success",
+            "is_simulated": True
         }

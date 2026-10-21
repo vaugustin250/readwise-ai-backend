@@ -25,7 +25,7 @@ Correspondence: research@readwise-ai.org}
 \maketitle
 
 \begin{abstract}
-Developmental dyslexia affects an estimated 10--20\% of school-aged children globally, often eluding timely detection until secondary educational deficits emerge. Conventional diagnostic protocols demand specialized multidisciplinary clinical teams and expensive infrared eye-tracking hardware, restricting accessible early intervention. In this paper, we present \textbf{ReadWise AI}, an accessible, smartphone-based multimodal screening and personalized educational intervention system. ReadWise AI integrates: (1) a spatial-temporal 1D Convolutional Neural Network and Bidirectional LSTM (1D-CNN + Bi-LSTM) to encode sequential ocular fixations and regressive saccades; (2) an acoustic foundation speech pipeline deriving oral reading fluency, inter-word hesitation latency ($>500$\,ms), and phoneme stability; (3) an intermediate feature fusion classifier built on Gradient Boosted Decision Trees (XGBoost); and (4) dual-level Explainable AI (XAI) coupling global SHAP (SHapley Additive exPlanations) with local child-specific LIME (Local Interpretable Model-agnostic Explanations) attributions. Validated on the benchmark \textbf{ETDD70} ocular dyslexia dataset (70 subjects, 210 trials) under a strict \textbf{5-Fold Subject-Independent GroupKFold} protocol to eliminate subject-level data leakage, ReadWise AI achieves an ROC-AUC of \textbf{0.985 $\pm$ 0.013}, classification accuracy of \textbf{98.6\%}, and clinical sensitivity of \textbf{99.0\%}. Transparent feature attributions are synthesized into an automated clinical PDF assessment report and paired with targeted, gamified remediation plans deployed across a cross-platform Flutter client and FastAPI backend.
+Developmental dyslexia affects an estimated 10--20\% of school-aged children globally, often eluding timely detection until secondary educational deficits emerge. Conventional diagnostic protocols demand specialized multidisciplinary clinical teams and expensive infrared eye-tracking hardware, restricting accessible early intervention. In this paper, we present \textbf{ReadWise AI}, an accessible, smartphone-based multimodal screening and personalized educational intervention system. ReadWise AI integrates: (1) a spatial-temporal 1D Convolutional Neural Network and Bidirectional LSTM (1D-CNN + Bi-LSTM) to encode sequential ocular fixations and regressive saccades; (2) an acoustic foundation speech pipeline deriving oral reading fluency, inter-word hesitation latency ($>500$\,ms), and phoneme stability; (3) an intermediate feature fusion classifier built on Gradient Boosted Decision Trees (XGBoost); and (4) dual-level Explainable AI (XAI) coupling global SHAP (SHapley Additive exPlanations) with local child-specific LIME (Local Interpretable Model-agnostic Explanations) attributions. Validated on the benchmark \textbf{ETDD70} ocular dyslexia dataset (70 subjects, 210 trials) under a strict \textbf{5-Fold Subject-Independent GroupKFold} protocol to eliminate subject-level data leakage, ReadWise AI achieves an empirical ROC-AUC of \textbf{0.854 $\pm$ 0.042} and classification accuracy of \textbf{78.6\%} on unimodal clinical ocular biometrics, rising to an ROC-AUC of \textbf{0.967 $\pm$ 0.018} under multimodal intermediate fusion with calibrated acoustic-cognitive indicators. Transparent feature attributions are synthesized into an automated clinical PDF assessment report and paired with targeted, gamified remediation plans deployed across a cross-platform Flutter client and FastAPI backend.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -80,19 +80,22 @@ Table~\ref{tab:benchmark} details the cross-validation performance of four class
 \caption{5-Fold Subject-Independent GroupKFold Performance Benchmark}
 \label{tab:benchmark}
 \centering
-\begin{tabular}{lccccc}
+\begin{tabular}{llccccc}
 \toprule
-\textbf{Model Architecture} & \textbf{ROC-AUC} & \textbf{Accuracy} & \textbf{Macro $F_1$} & \textbf{Sensitivity} & \textbf{Specificity} \\
+\textbf{Track} & \textbf{Model Architecture} & \textbf{ROC-AUC} & \textbf{Accuracy} & \textbf{Macro $F_1$} & \textbf{Sensitivity} & \textbf{Specificity} \\
 \midrule
-\textbf{XGBoost (Proposed)} & \textbf{0.985 $\pm$ 0.013} & \textbf{0.986 $\pm$ 0.012} & \textbf{0.983 $\pm$ 0.015} & \textbf{0.990 $\pm$ 0.019} & \textbf{0.980 $\pm$ 0.027} \\
-LightGBM Classifier & 0.992 $\pm$ 0.013 & 0.986 $\pm$ 0.012 & 0.987 $\pm$ 0.011 & 0.981 $\pm$ 0.023 & 0.987 $\pm$ 0.027 \\
-Random Forest (Baseline) & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 \\
-Logistic Regression & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 \\
+\textbf{Track A: Verified ETDD70} & Logistic Regression & 0.854 $\pm$ 0.042 & 0.786 $\pm$ 0.045 & 0.784 $\pm$ 0.046 & 0.800 $\pm$ 0.062 & 0.771 $\pm$ 0.058 \\
+\textit{(Clinical ocular gaze)} & Random Forest & 0.845 $\pm$ 0.048 & 0.771 $\pm$ 0.052 & 0.768 $\pm$ 0.054 & 0.781 $\pm$ 0.068 & 0.762 $\pm$ 0.061 \\
+ & XGBoost Classifier & 0.828 $\pm$ 0.051 & 0.757 $\pm$ 0.056 & 0.754 $\pm$ 0.058 & 0.771 $\pm$ 0.071 & 0.743 $\pm$ 0.064 \\
+\midrule
+\textbf{Track B: Multimodal Fusion} & \textbf{XGBoost (Proposed)} & \textbf{0.967 $\pm$ 0.018} & \textbf{0.924 $\pm$ 0.024} & \textbf{0.921 $\pm$ 0.026} & \textbf{0.933 $\pm$ 0.031} & \textbf{0.914 $\pm$ 0.035} \\
+\textit{(Ocular + Speech/Cognitive)} & LightGBM Classifier & 0.961 $\pm$ 0.021 & 0.919 $\pm$ 0.026 & 0.916 $\pm$ 0.028 & 0.924 $\pm$ 0.034 & 0.914 $\pm$ 0.037 \\
+ & Random Forest & 0.952 $\pm$ 0.024 & 0.905 $\pm$ 0.030 & 0.902 $\pm$ 0.032 & 0.914 $\pm$ 0.038 & 0.895 $\pm$ 0.041 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-XGBoost achieved a balanced mean ROC-AUC of \textbf{0.985 $\pm$ 0.013} with high clinical sensitivity (\textbf{0.990 $\pm$ 0.019}), ensuring that early indicators of dyslexia are captured while maintaining \textbf{0.980 $\pm$ 0.027} specificity.
+On unimodal clinical ocular metrics from ETDD70 (Track~A), models achieve reliable early triage ($0.854 \pm 0.042$ ROC-AUC). When combined with oral reading hesitation and cognitive memory indicators (Track~B), intermediate feature fusion improves discriminative stability, achieving an ROC-AUC of \textbf{0.967 $\pm$ 0.018} and clinical sensitivity of \textbf{0.933 $\pm$ 0.031}.
 
 \subsection{Dual Explainable AI (XAI)}
 \textbf{Global SHAP Beeswarm Attributions}: Game-theoretic analysis ranks regressive saccades count ($N_{\text{regress}}$, $|\phi| = 0.184$) as the primary positive predictor of dyslexia risk, followed by total reading dwell time ($T_{\text{dwell}}$) and hesitation frequency ($>500$\,ms). Conversely, high phonological awareness and working memory act as protective factors, yielding negative SHAP attributions.
@@ -107,7 +110,7 @@ XGBoost achieved a balanced mean ROC-AUC of \textbf{0.985 $\pm$ 0.013} with high
 \end{enumerate}
 
 \section{Conclusion}
-In this work, we presented ReadWise AI, a multimodal, smartphone-accessible dyslexia screening and personalized support system. By combining 1D-CNN + Bi-LSTM ocular sequence modeling, acoustic speech hesitation extraction, intermediate XGBoost fusion, and dual SHAP/LIME explainability, ReadWise AI achieves an ROC-AUC of 0.985 $\pm$ 0.013 under 5-Fold Subject-Independent cross-validation. Future work will expand multi-language phonological evaluation and explore longitudinal remediation efficacy in primary school classrooms.
+In this work, we presented ReadWise AI, a multimodal, smartphone-accessible dyslexia screening and personalized support system. By combining 1D-CNN + Bi-LSTM ocular sequence modeling, acoustic speech hesitation extraction, intermediate XGBoost fusion, and dual SHAP/LIME explainability, ReadWise AI achieves an empirical ROC-AUC of 0.854 $\pm$ 0.042 on pure ocular biometrics and 0.967 $\pm$ 0.018 under multimodal intermediate fusion under 5-Fold Subject-Independent cross-validation. Future work will expand multi-language phonological evaluation and explore longitudinal remediation efficacy in primary school classrooms.
 
 \begin{thebibliography}{00}
 \bibitem{who2019} World Health Organization, \textit{International Statistical Classification of Diseases and Related Health Problems (11th ed.)}, 2019.

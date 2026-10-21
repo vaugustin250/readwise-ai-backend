@@ -146,3 +146,33 @@ def test_pdf_report_generation_authorized(auth_guardian_and_child):
     res_query = client.get(f"/api/v1/assessments/report/{child_id}?token={token}")
     assert res_query.status_code == 200
     assert res_query.headers["content-type"] == "application/pdf"
+
+
+def test_missing_modalities_graceful_handling(auth_guardian_and_child):
+    """Verifies that omitted speech/cognitive modalities are handled gracefully with confidence penalty."""
+    headers, child_id, _ = auth_guardian_and_child
+
+    # Request with ONLY eye-gaze biomechanics; speech and cognitive metrics omitted (None)
+    payload = {
+        "child_id": child_id,
+        "task_type": "T4_Meaningful_Text",
+        "dwell_time_trial": 85000.0,
+        "n_regress_trial": 16.0,
+        "mean_fix_dur_trial": 440.0,
+        "ratio_progress_regress_trial": 6.8,
+        "mean_sacc_ampl_trial": 88.0,
+        "speech_hesitation_rate": None,
+        "speech_phoneme_stability": None,
+        "cognitive_working_memory": None,
+        "phonological_awareness_score": None
+    }
+    response = client.post("/api/v1/assessments/screen", json=payload, headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["child_id"] == child_id
+    assert "risk_probability" in data
+    # Confidence should reflect penalty for 4 unmeasured modalities
+    assert data["confidence_score"] <= 0.85
+    # Verify zero 'gaze_emb' keys in SHAP explanation
+    shap_keys = data["feature_contributions_shap"].keys()
+    assert not any(k.startswith("gaze_emb_") for k in shap_keys)
