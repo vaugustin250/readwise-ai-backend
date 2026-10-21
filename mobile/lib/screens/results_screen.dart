@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/assessment_result.dart';
 import '../models/child_profile.dart';
 import '../repositories/assessment_service.dart';
@@ -401,6 +402,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
             ],
           ),
           actions: [
+            ElevatedButton.icon(
+              onPressed: () async {
+                final uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              icon: const Icon(Icons.download, size: 16),
+              label: const Text('Open / Save PDF'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
+              ),
+            ),
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: const Text('Close'),
