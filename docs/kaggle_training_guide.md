@@ -4,8 +4,15 @@ This guide provides end-to-end instructions for training the complete multimodal
 
 ---
 
-## 1. Overview of the 3 Parallel Notebooks
+## 1. Choose Your Training Workflow
+ 
+You can choose between **Option 1 (All-in-One Master Notebook)** or **Option 2 (3 Modular Parallel Notebooks)**:
 
+### Option 1: Master Unified Pipeline (Recommended for 1-Click Execution)
+* **Notebook**: [`notebooks/kaggle_readwise_complete_training.ipynb`](file:///d:/dyslexia/notebooks/kaggle_readwise_complete_training.ipynb)
+* **Description**: Trains the 1D-CNN + Bi-LSTM Spatial-Temporal Gaze Network, computes the Track A ETDD70 benchmark, performs multimodal feature fusion, trains the master XGBoost screener, generates 300 DPI SHAP/LIME figures, and exports the production `multimodal_xgboost_screener.joblib` artifact in a single notebook.
+
+### Option 2: 3 Modular Parallel Notebooks (For Advanced Multi-GPU Scaling)
 The architecture is split into three modular, independently executable notebooks located in [`d:\dyslexia\notebooks\`](file:///d:/dyslexia/notebooks/):
 
 | Notebook | Focus Modality & Model | Key Outputs | Checkpoint File |

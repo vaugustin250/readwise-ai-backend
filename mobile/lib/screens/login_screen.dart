@@ -30,9 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
       if (success) {
         Navigator.pushReplacementNamed(context, '/dashboard');
       } else {
+        final errMsg = AuthRepository().lastErrorMessage ?? 'Invalid credentials. If this is your first time, tap "Create Account".';
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid credentials. If this is your first time, tap "Create Account".'),
+          SnackBar(
+            content: Text(errMsg),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -61,9 +62,10 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         Navigator.pushReplacementNamed(context, '/dashboard');
       } else {
+        final errMsg = AuthRepository().lastErrorMessage ?? 'Registration failed. Please check network connection or try a different email.';
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registration failed. Email may already be in use.'),
+          SnackBar(
+            content: Text(errMsg),
             backgroundColor: Colors.redAccent,
           ),
         );

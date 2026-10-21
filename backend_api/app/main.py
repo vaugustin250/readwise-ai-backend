@@ -15,9 +15,11 @@ from app.api.v1.api import api_router
 from app.core.config import settings
 from app.core.database import Base, engine
 
-# Create tables for dev/testing (In production, use Alembic migrations)
-if settings.ENVIRONMENT != "production":
+# Ensure all tables exist safely on startup
+try:
     Base.metadata.create_all(bind=engine)
+except Exception as _init_err:
+    print("Database startup initialization notice:", _init_err)
 
 app = FastAPI(title=settings.PROJECT_NAME)
 

@@ -1,8 +1,14 @@
+databases:
+  - name: readwise-db
+    databaseName: readwise
+    user: readwise_user
+    plan: free
+
 services:
   - type: web
     name: readwise-ai-backend
     runtime: python
-    buildCommand: pip install -r backend_api/requirements.txt
+    buildCommand: pip install -r backend_api/requirements.txt && alembic -c backend_api/alembic.ini upgrade head
     startCommand: cd backend_api && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
@@ -13,3 +19,7 @@ services:
         value: production
       - key: SECRET_KEY
         generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: readwise-db
+          property: connectionString
