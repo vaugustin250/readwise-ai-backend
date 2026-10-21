@@ -1,0 +1,15 @@
+name: Keep Render Backend Active
+
+on:
+  schedule:
+    # Run every 14 minutes to prevent Render free instance from spinning down
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Backend Endpoint
+        run: |
+          curl -s -f -m 30 https://readwise-ai-backend.onrender.com/ || echo "Server waking up..."
