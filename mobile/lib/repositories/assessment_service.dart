@@ -8,19 +8,8 @@ class AssessmentService {
   factory AssessmentService() => _instance;
   AssessmentService._internal();
 
-  /// Default local development base URL.
-  /// On Android emulator: 10.0.2.2:8000
-  /// On Web/Desktop: 127.0.0.1:8000
-  String get baseUrl {
-    if (kIsWeb) {
-      return 'http://127.0.0.1:8000';
-    }
-    // Check if running on Android
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2:8000';
-    }
-    return 'http://127.0.0.1:8000';
-  }
+  /// Production Render cloud backend URL
+  String get baseUrl => 'https://readwise-ai-backend.onrender.com';
 
   /// Sends multimodal trial data to the FastAPI `/api/v1/assessments/screen` endpoint.
   Future<AssessmentResult> submitAssessment({

@@ -13,11 +13,8 @@ class ProfileRepository {
     ChildProfile(id: '2', name: 'Maya', age: 8, grade: 'Grade 3', language: 'English'),
   ];
 
-  String get baseUrl {
-    if (kIsWeb) return 'http://127.0.0.1:8000';
-    if (defaultTargetPlatform == TargetPlatform.android) return 'http://10.0.2.2:8000';
-    return 'http://127.0.0.1:8000';
-  }
+  /// Production Render cloud backend URL
+  String get baseUrl => 'https://readwise-ai-backend.onrender.com';
 
   Map<String, String> get _headers => {
     'Content-Type': 'application/json',
