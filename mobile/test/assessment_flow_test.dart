@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/models/assessment_result.dart';
 import 'package:mobile/repositories/assessment_service.dart';
+import 'package:mobile/repositories/auth_repository.dart';
+import 'package:mobile/services/cognitive_score_service.dart';
 
 void main() {
   group('Assessment Model & Service Tests', () {
@@ -52,6 +54,25 @@ void main() {
       expect(url, contains('age=9'));
       expect(url, contains('grade=Grade%204'));
       expect(url, contains('risk_prob=0.785'));
+    });
+
+    test('CognitiveScoreService accurately persists and retrieves child scores', () {
+      final service = CognitiveScoreService();
+      service.recordScores('child_42', workingMemory: 88.5, phonologicalAwareness: 91.0);
+
+      expect(service.getWorkingMemory('child_42'), 88.5);
+      expect(service.getPhonologicalAwareness('child_42'), 91.0);
+
+      // Default baseline for unrecorded child
+      expect(service.getWorkingMemory('unrecorded_child'), 80.0);
+      expect(service.getPhonologicalAwareness('unrecorded_child'), 82.0);
+    });
+
+    test('AuthRepository handles logout and session state', () {
+      final auth = AuthRepository();
+      auth.logout();
+      expect(auth.isAuthenticated, false);
+      expect(auth.authToken, null);
     });
   });
 }

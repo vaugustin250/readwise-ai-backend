@@ -20,6 +20,7 @@ class AssessmentSelectionScreen extends StatelessWidget {
               const SizedBox(height: 24),
               _buildActivityCard(
                 context,
+                child: child,
                 title: 'Start Screening',
                 subtitle: 'Reading and speech assessment',
                 icon: Icons.mic_rounded,
@@ -29,15 +30,17 @@ class AssessmentSelectionScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildActivityCard(
                 context,
+                child: child,
                 title: 'Cognitive Games',
                 subtitle: 'Fun memory & letter games',
                 icon: Icons.games_rounded,
-                color: Theme.of(context).colorScheme.error, // accent color
+                color: Theme.of(context).colorScheme.error,
                 route: '/cognitive_game',
               ),
               const SizedBox(height: 16),
               _buildActivityCard(
                 context,
+                child: child,
                 title: 'Learning Plan',
                 subtitle: 'Personalized activities',
                 icon: Icons.menu_book_rounded,
@@ -47,11 +50,12 @@ class AssessmentSelectionScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildActivityCard(
                 context,
-                title: 'Latest Results (Mock Demo)',
-                subtitle: 'View previous screening insights',
+                child: child,
+                title: 'Progress History',
+                subtitle: 'Track assessment trajectory and reading speed',
                 icon: Icons.analytics_rounded,
                 color: Colors.orange,
-                route: '/results',
+                route: '/progress',
               ),
             ],
           ),
@@ -60,14 +64,22 @@ class AssessmentSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActivityCard(BuildContext context, {required String title, required String subtitle, required IconData icon, required Color color, required String route}) {
+  Widget _buildActivityCard(
+    BuildContext context, {
+    required ChildProfile child,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required String route,
+  }) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
-          Navigator.pushNamed(context, route);
+          Navigator.pushNamed(context, route, arguments: child);
         },
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -86,13 +98,19 @@ class AssessmentSelectionScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18),
+                    ),
                     const SizedBox(height: 4),
-                    Text(subtitle, style: TextStyle(color: Colors.grey[700], fontSize: 14)),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                    ),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 16),
             ],
           ),
         ),

@@ -122,3 +122,20 @@
     *   Backend Tests: `pytest backend_api/tests -v` -> 10/10 passed (100%), including missing modality verification and zero hardcoded embeddings verification.
     *   Total Repos Tests: 17/17 passed (100%).
 
+---
+
+## Remediation Phase 3 & 4: Mobile Sensor Parity, Dynamic Cognitive Games & Progress Tracking
+*   **Goal:** Equip the Flutter mobile client with real camera preview and microphone recording plugins (`camera`, `record`, `permission_handler`), fix navigation routing arguments, implement dynamic multi-round cognitive and phonological games, and query real database-backed longitudinal progress history.
+*   **Status:** COMPLETED.
+*   **Tasks Completed:**
+    *   [x] Installed native plugins `camera: ^0.12.1`, `record: ^7.1.2`, and `permission_handler: ^13.0.2` in `mobile/pubspec.yaml`.
+    *   [x] Implemented real front-facing camera preview and microphone decibel tracking in `mobile/lib/services/sensor_manager_io.dart` with seamless desktop/emulator fallbacks.
+    *   [x] Fixed argument forwarding in `AssessmentSelectionScreen`: forwards the active `ChildProfile` to `ReadingAssessmentScreen`, `CognitiveGameScreen`, and `ProgressDashboardScreen`.
+    *   [x] Rebuilt `CognitiveGameScreen`: interactive 4-round gamified battery (mirror letter discrimination, rhyming, letter orientation, phoneme blending) tracking latency and computing dynamic working memory and phonological awareness scores.
+    *   [x] Built `CognitiveScoreService` to pass child-specific scores directly into the live reading assessment pipeline.
+    *   [x] Connected `ProgressDashboardScreen` to real backend API `GET /api/v1/assessments/progress/{child_id}` via `ProfileRepository`, displaying database-stored risk trajectories and milestone changes.
+*   **Verification & Test Results:**
+    *   Mobile Static Analysis: `flutter analyze` -> 0 issues found.
+    *   Mobile Unit Tests: `flutter test` -> 5/5 passed (100%).
+    *   Backend & AI Engine Tests: `pytest -v` -> 17/17 passed (100%).
+

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/child_profile.dart';
 import '../repositories/assessment_service.dart';
+import '../services/cognitive_score_service.dart';
 import '../services/sensor_manager.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/parental_consent_dialog.dart';
@@ -136,14 +137,17 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
 
     // Call live cloud backend API on Render with REAL measured metrics
     final childId = int.tryParse(child?.id ?? '1') ?? 1;
+    final measuredWM = CognitiveScoreService().getWorkingMemory(child?.id ?? '1');
+    final measuredPhono = CognitiveScoreService().getPhonologicalAwareness(child?.id ?? '1');
+
     final result = await _assessmentService.submitAssessment(
       childId: childId,
       dwellTimeTrial: actualDwellMs > 1000 ? actualDwellMs : 35000.0,
       nRegressTrial: actualRegressions,
       speechHesitationRate: actualHesitations > 0 ? actualHesitations : 1.8,
       speechPhonemeStability: actualPhonemeStability,
-      cognitiveWorkingMemory: 82.0,
-      phonologicalAwarenessScore: 78.0,
+      cognitiveWorkingMemory: measuredWM,
+      phonologicalAwarenessScore: measuredPhono,
     );
 
     if (mounted) {
