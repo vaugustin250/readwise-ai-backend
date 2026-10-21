@@ -36,17 +36,19 @@ screener_artifact = None
 explainer = None
 feature_names = []
 
+import xgboost as xgb
+
 def get_screener():
-    global screener_artifact, explainer, feature_names
+    global screener_artifact, feature_names
     if screener_artifact is None and os.path.exists(MODEL_PATH):
         try:
             screener_artifact = joblib.load(MODEL_PATH)
             feature_names = screener_artifact.get("features", [])
-            model = screener_artifact.get("model")
-            explainer = shap.TreeExplainer(model)
+            print(f"Loaded master screener model from: {MODEL_PATH} ({len(feature_names)} features)")
         except Exception as e:
+            print("Failed to load model from path:", MODEL_PATH, e)
             screener_artifact = None
-    return screener_artifact, explainer, feature_names
+    return screener_artifact, feature_names
 
 # Schemas
 class AssessmentScreenRequest(BaseModel):
@@ -80,7 +82,7 @@ def screen_child_assessment(request: AssessmentScreenRequest, db: Session = Depe
     using the trained XGBoost screener and outputs transparent SHAP explanations with a
     targeted educational intervention plan.
     """
-    artifact, tree_explainer, feats = get_screener()
+    artifact, feats = get_screener()
     rec_engine = RecommendationEngine()
     
     # Construct feature dictionary
@@ -101,17 +103,16 @@ def screen_child_assessment(request: AssessmentScreenRequest, db: Session = Depe
         input_data[f"gaze_emb_{i}"] = 0.5
 
     # Run model prediction if loaded
-    if artifact and tree_explainer:
+    if artifact:
         model = artifact["model"]
         df_row = pd.DataFrame([input_data])[feats]
         
         prob = float(model.predict_proba(df_row)[0, 1])
-        shap_vals = tree_explainer.shap_values(df_row)
         
-        # Format SHAP dictionary
-        vals = shap_vals[0] if hasattr(shap_vals, 'ndim') and shap_vals.ndim == 2 else shap_vals
-        shap_dict = {feat: round(float(vals[0, idx] if hasattr(vals, 'ndim') and vals.ndim == 2 else vals[idx]), 4) 
-                     for idx, feat in enumerate(feats)}
+        # Native XGBoost Tree SHAP calculation
+        dmat = xgb.DMatrix(df_row)
+        contribs = model.get_booster().predict(dmat, pred_contribs=True)
+        shap_dict = {feat: round(float(contribs[0, idx]), 4) for idx, feat in enumerate(feats)}
     else:
         # Fallback calibrated estimate
         prob = 0.25 if request.n_regress_trial < 20 and request.speech_hesitation_rate < 3.0 else 0.72
