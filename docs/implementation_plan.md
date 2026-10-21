@@ -139,3 +139,23 @@
     *   Mobile Unit Tests: `flutter test` -> 5/5 passed (100%).
     *   Backend & AI Engine Tests: `pytest -v` -> 17/17 passed (100%).
 
+---
+
+## Remediation Phase 5: PDF Dynamic Data Binding & Expanded Mobile Test Suite
+*   **Goal:** Bind downloaded PDF reports directly to persistent database assessment records, eliminate synthetic fallback values in reports, and expand the mobile widget test suite with coverage of primary user journeys, input validation, and offline resilience.
+*   **Status:** COMPLETED.
+*   **Tasks Completed:**
+    *   [x] Refactored `GET /api/v1/assessments/report/{child_id}` in `assessments.py` to query the latest database `Assessment` and `Metrics` records for the child.
+    *   [x] Passed authentic risk probabilities, screening levels, SHAP attributions, and measured saccadic regressions into `DyslexiaReportGenerator`, ensuring generated PDF reports reflect actual child trial data.
+    *   [x] Added flexible argument handling to `ReadingAssessmentScreen` (`ModalRoute` arguments accept either direct `ChildProfile` or map payload).
+    *   [x] Expanded Flutter mobile test suite (`mobile/test/screens_widget_test.dart`):
+        *   `LoginScreen`: Tested input rendering, empty field validation errors, and account registration toggles.
+        *   `ParentDashboardScreen`: Tested app bar navigation, progress icon routing, and child profile listing states.
+        *   `ReadingAssessmentScreen`: Tested passage rendering, word highlights, sensor state indicators, and parental consent flow.
+        *   `AssessmentService`: Tested network failure recovery and verified that offline mathematical fallback returns safe, calibrated educational screening estimates with mandatory clinical disclaimers.
+*   **Verification & Test Results:**
+    *   Mobile Test Suite: `flutter test` -> 9/9 passed (100%).
+    *   Mobile Static Analysis: `flutter analyze` -> 0 issues found.
+    *   Backend & AI Engine Tests: `pytest -v` -> 17/17 passed (100%).
+
+

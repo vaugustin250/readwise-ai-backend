@@ -183,7 +183,10 @@ class _ReadingAssessmentScreenState extends State<ReadingAssessmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ChildProfile? child = ModalRoute.of(context)?.settings.arguments as ChildProfile?;
+    final dynamic routeArgs = ModalRoute.of(context)?.settings.arguments;
+    final ChildProfile? child = routeArgs is ChildProfile
+        ? routeArgs
+        : (routeArgs is Map ? routeArgs['child'] as ChildProfile? : null);
 
     return Scaffold(
       appBar: AppBar(
