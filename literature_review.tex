@@ -1,0 +1,174 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{hyperref}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{A CNN--LSTM Multimodal Deep Learning Framework Integrating Smartphone-Based Eye-Gaze Tracking, Speech Intelligence, and SHAP--LIME Explainability for Early Dyslexia Risk Screening and Personalized Reading Intervention in Pediatric Populations}
+
+\author{\IEEEauthorblockN{Afna Fathima K}
+\IEEEauthorblockA{\textit{Department of Computer Science and Engineering} \\
+\textit{Karunya Institute of Technology and Sciences}\\
+Coimbatore, India \\
+afnafathima@karunya.edu.in}
+\and
+\IEEEauthorblockN{Raj Thilak J}
+\IEEEauthorblockA{\textit{Department of Computer Science and Engineering} \\
+\textit{Karunya Institute of Technology and Sciences}\\
+Coimbatore, India \\
+rajthilak@karunya.edu}
+}
+
+\maketitle
+
+\begin{abstract}
+Dyslexia is one of the most prevalent neurodevelopmental learning disorders affecting children's reading, spelling, and language processing abilities, making early identification and timely educational intervention essential for improving long-term academic outcomes. Conventional dyslexia screening primarily relies on standardized assessments administered by trained specialists and, in some cases, specialized eye-tracking equipment, resulting in high costs, limited accessibility, and delayed intervention, particularly in resource-constrained educational settings. Recent advancements in Artificial Intelligence (AI), Computer Vision, Speech Intelligence, and Multimodal Deep Learning have created new opportunities for developing accessible and intelligent screening systems capable of analyzing multiple behavioral indicators simultaneously. However, many existing AI-based dyslexia detection approaches focus on a single modality, such as eye movements or speech patterns, and often function as black-box models with limited interpretability, reducing the confidence of educators, parents, and clinicians in AI-assisted decision-making.
+
+This paper proposes a CNN--LSTM Multimodal Deep Learning Framework integrating smartphone-based eye-gaze tracking, speech intelligence, and SHAP--LIME explainability for early dyslexia risk screening and personalized reading intervention in pediatric populations. The proposed framework leverages MediaPipe Face Mesh and OpenCV to estimate eye-gaze behavior using a smartphone camera, Whisper and Wav2Vec2 to analyze speech fluency and pronunciation, CNN for spatial feature extraction, LSTM for modeling temporal reading and speech patterns, and XGBoost for multimodal risk classification. Furthermore, SHAP and LIME are incorporated to provide both global and local explanations of model predictions, enhancing transparency and supporting educational decision-making. Beyond risk screening, the framework includes an adaptive reading intervention module and longitudinal progress monitoring to deliver personalized learning recommendations and continuous performance assessment. The proposed system aims to provide an accessible, explainable, and scalable AI-driven educational decision-support platform that assists parents, teachers, and educational professionals in the early identification of children at risk of dyslexia while promoting personalized learning and improved reading outcomes.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Dyslexia Risk Screening, Multimodal Deep Learning, CNN--LSTM, Explainable Artificial Intelligence (XAI), Eye-Gaze Tracking, Speech Intelligence, SHAP, LIME, Personalized Reading Intervention, Educational Decision Support, Pediatric Learning Analytics.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Dyslexia is one of the most common neurodevelopmental learning disorders, affecting approximately 5--10\% of school-aged children worldwide. It is characterized by persistent difficulties in accurate word recognition, reading fluency, spelling, phonological processing, and reading comprehension despite normal intelligence and adequate educational opportunities. Early identification of dyslexia is essential because timely intervention can significantly improve literacy skills, academic performance, cognitive development, and overall quality of life. However, delayed screening often results in prolonged learning difficulties, reduced self-confidence, and increased educational disparities, particularly among children in resource-limited environments.
+
+Conventional dyslexia screening primarily relies on standardized psychometric assessments conducted by educational psychologists, speech-language pathologists, or specialized learning disability professionals. These assessments frequently involve multiple evaluation sessions, manual observation, reading exercises, cognitive testing, and, in some advanced settings, dedicated eye-tracking hardware to analyze visual reading behavior. Although these methods provide reliable clinical insights, they are often expensive, time-consuming, dependent on specialist availability, and inaccessible in many schools and rural communities. Consequently, there is a growing need for accessible, cost-effective, and technology-driven screening solutions capable of supporting early educational decision-making without replacing formal clinical diagnosis.
+
+Recent advancements in Artificial Intelligence (AI), Computer Vision, Speech Intelligence, and Deep Learning have significantly transformed intelligent educational technologies by enabling automated analysis of complex behavioral and cognitive patterns. Convolutional Neural Networks (CNNs) have demonstrated remarkable capability in extracting discriminative spatial features from visual data, making them suitable for analyzing eye-gaze behavior, facial landmarks, and reading-related visual characteristics. Likewise, Long Short-Term Memory (LSTM) networks have proven highly effective in modeling sequential and temporal dependencies present in speech signals, reading fluency, pronunciation patterns, and eye-movement trajectories. The complementary strengths of CNN and LSTM architectures enable the simultaneous analysis of spatial and temporal information, making them well suited for multimodal dyslexia risk assessment.
+
+In parallel, smartphone technology has emerged as a powerful platform for deploying intelligent healthcare and educational applications. Modern smartphones equipped with high-resolution front-facing cameras and microphones enable real-time acquisition of eye-gaze patterns, facial movements, and speech without requiring expensive laboratory-grade eye-tracking devices. Computer vision frameworks such as MediaPipe Face Mesh and OpenCV facilitate accurate estimation of facial landmarks and eye-gaze behavior, while advanced speech intelligence models including Whisper and Wav2Vec2 provide robust transcription, pronunciation analysis, and speech feature extraction under varying environmental conditions. The integration of these technologies enables the development of scalable, low-cost, and widely accessible dyslexia screening systems that can operate using commonly available mobile devices.
+
+Despite these technological advancements, many existing AI-based dyslexia detection systems rely on a single source of information, such as eye movements, speech characteristics, or reading performance, thereby limiting their ability to capture the complex and multifactorial nature of dyslexia. Furthermore, most deep learning models function as black-box systems, producing predictions without explaining the underlying reasoning behind their decisions. Such lack of transparency reduces trust among parents, teachers, educational psychologists, and clinicians, thereby limiting the practical adoption of AI-assisted screening tools in educational environments. Explainable Artificial Intelligence (XAI) techniques, including SHAP (SHapley Additive exPlanations) and LIME (Local Interpretable Model-agnostic Explanations), have recently emerged as effective approaches for improving model interpretability by identifying the contribution of individual features to prediction outcomes and providing both global and local explanations.
+
+To address these challenges, this paper proposes a CNN--LSTM Multimodal Deep Learning Framework integrating smartphone-based eye-gaze tracking, speech intelligence, and SHAP--LIME explainability for early dyslexia risk screening and personalized reading intervention in pediatric populations. The proposed framework combines smartphone-acquired eye-gaze behavior, speech characteristics, reading performance, cognitive assessment outcomes, and behavioral indicators into a unified multimodal learning architecture. CNN is employed to learn spatial representations from visual inputs, while LSTM captures temporal dependencies within sequential reading and speech data. The extracted multimodal features are fused and classified using XGBoost, with Random Forest serving as a comparative baseline model. To enhance transparency and support educational decision-making, SHAP and LIME are integrated to explain both global model behavior and individual predictions. Furthermore, the framework incorporates an adaptive reading intervention module, AI-assisted reading coaching, personalized learning recommendations, and longitudinal progress monitoring through dedicated parent and teacher dashboards.
+
+Unlike conventional dyslexia screening approaches that require specialized equipment and expert supervision, the proposed framework leverages widely available smartphone technology to provide an accessible, explainable, and scalable educational decision-support system. By integrating multimodal deep learning, explainable AI, and personalized learning analytics, the proposed system aims to facilitate early dyslexia risk identification, promote timely educational intervention, and improve reading outcomes among pediatric populations while supporting parents, teachers, and educational professionals with transparent and actionable insights.
+
+\section{Literature Review}
+Recent advances in Artificial Intelligence (AI), Computer Vision, Speech Intelligence, and Deep Learning have significantly improved the development of intelligent educational technologies for early dyslexia screening and intervention. Researchers have explored eye-movement analysis, speech processing, multimodal learning, explainable artificial intelligence (XAI), and mobile-based educational systems to enhance screening accuracy, accessibility, and personalized learning. The following studies summarize important developments in this research area.
+
+\subsection{AI-Based Dyslexia Detection Using Eye Movement Analysis (2024)}
+Recent studies have demonstrated that eye movement behavior provides valuable biomarkers for identifying dyslexia. By analyzing fixation duration, saccadic movements, regressions, and gaze trajectories during reading tasks, researchers have successfully differentiated children with dyslexia from typical readers. Computer vision techniques combined with machine learning algorithms have shown promising classification performance while reducing the need for specialized clinical assessments. However, most studies rely on dedicated infrared eye-tracking devices, limiting their affordability and scalability for large-scale educational deployment.
+
+\subsection{Deep Learning-Based Speech Analysis for Reading Disorder Assessment (2023)}
+Speech processing has emerged as another effective modality for dyslexia screening. Recent research employs automatic speech recognition and deep learning models to analyze pronunciation accuracy, phonological awareness, reading fluency, speaking rate, and hesitation patterns. Models based on CNNs, recurrent neural networks, and self-supervised speech representation learning have demonstrated improved recognition of speech abnormalities associated with dyslexia. Nevertheless, many approaches depend on isolated speech features and fail to integrate complementary behavioral information obtained during reading activities.
+
+\subsection{Multimodal Deep Learning for Learning Disorder Prediction (2024)}
+Recent multimodal learning frameworks combine visual, auditory, and behavioral information to improve prediction performance. These approaches integrate eye-gaze characteristics, speech features, reading accuracy, cognitive assessments, and demographic information within unified deep learning architectures. CNNs are commonly employed for extracting spatial representations, while LSTM networks effectively model sequential reading and speech patterns. Experimental results indicate that multimodal learning consistently outperforms unimodal approaches by capturing complementary information across multiple behavioral modalities. However, many existing systems require complex data acquisition setups and lack personalized educational support after risk prediction.
+
+\subsection{Explainable Artificial Intelligence for Educational Decision Support (2024)}
+Explainable Artificial Intelligence (XAI) has become increasingly important in educational and healthcare applications where transparency is essential for user trust. Techniques such as SHAP (SHapley Additive exPlanations) and LIME (Local Interpretable Model-Agnostic Explanations) enable researchers to identify the contribution of individual features toward prediction outcomes while providing interpretable explanations for end users. In dyslexia screening applications, explainable AI helps parents, teachers, and educational professionals understand why a child has been classified as being at risk rather than relying solely on prediction scores. Despite these advances, explainability is often implemented only as a post-processing visualization technique rather than being integrated into a complete educational decision-support framework.
+
+\subsection{Smartphone-Based Educational Screening Systems (2023)}
+The widespread availability of smartphones has encouraged researchers to develop mobile-based educational screening platforms capable of performing behavioral assessments outside clinical environments. Modern smartphones equipped with high-resolution cameras and microphones enable the collection of eye-gaze behavior, facial landmarks, speech recordings, and reading performance without requiring expensive laboratory equipment. Computer vision frameworks such as MediaPipe Face Mesh and OpenCV facilitate real-time facial landmark detection, while speech intelligence models provide automated pronunciation analysis. Although mobile platforms significantly improve accessibility, many existing applications focus primarily on data collection and basic assessments rather than intelligent multimodal analysis and adaptive learning intervention.
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox{0.9\linewidth}{\centering \vspace{20pt} [Comparative Summary of Existing Literature on AI-Based Dyslexia Risk Screening Techniques] \vspace{20pt}}}
+\caption{Comparative Summary of Existing Literature on AI-Based Dyslexia Risk Screening Techniques.}
+\label{fig:lit_summary}
+\end{figure}
+
+\section{Research Gap}
+Although recent advancements in Artificial Intelligence (AI), Computer Vision, Speech Intelligence, and Deep Learning have significantly improved the early detection of dyslexia, several limitations continue to hinder the development of reliable, accessible, and interpretable screening systems. Most existing approaches rely on a single modality, such as eye-movement analysis, speech assessment, or reading behavior, which limits their ability to capture the complex cognitive and behavioral characteristics associated with dyslexia. While these unimodal systems demonstrate promising classification performance, they often fail to exploit the complementary information available across multiple data sources, resulting in reduced robustness and generalization.
+
+Furthermore, many AI-based dyslexia screening models function as black-box systems, providing limited transparency regarding the factors influencing their predictions. This lack of interpretability reduces the confidence of parents, teachers, educational psychologists, and clinicians in adopting AI-assisted educational decision-support systems. Although Explainable Artificial Intelligence (XAI) techniques such as SHAP and LIME have been explored in educational AI applications, they are frequently employed only as post-hoc visualization tools and are rarely integrated into a comprehensive explainable screening framework capable of providing both global and local interpretations.
+
+Another significant limitation is the dependence on specialized eye-tracking hardware in many existing studies. Dedicated eye-tracking devices provide accurate gaze measurements but are expensive, require controlled laboratory environments, and are impractical for large-scale deployment in schools and rural educational settings. In contrast, the potential of smartphone-based eye-gaze tracking using computer vision techniques remains relatively underexplored, despite its advantages in terms of accessibility, affordability, and scalability.
+
+Moreover, existing dyslexia screening systems primarily focus on risk prediction and often lack intelligent educational support following assessment. Most approaches provide only a classification result without offering personalized reading interventions, adaptive learning recommendations, AI-assisted reading guidance, or longitudinal progress monitoring. Consequently, these systems contribute little to continuous educational support or individualized learning improvement after the initial screening process.
+
+Additional challenges include the limited availability of large-scale multimodal pediatric dyslexia datasets, variations in reading behavior across different age groups and languages, and the computational complexity associated with integrating heterogeneous data sources such as eye-gaze patterns, speech characteristics, reading performance, and cognitive assessment outcomes. These challenges continue to affect the robustness, scalability, and real-world applicability of existing AI-based dyslexia screening frameworks.
+
+Therefore, there is a need for an explainable multimodal deep learning framework that integrates smartphone-based eye-gaze tracking, speech intelligence, reading behavior analysis, and cognitive assessment within a unified AI architecture. The proposed CNN--LSTM multimodal framework, supported by MediaPipe Face Mesh, OpenCV, Whisper, Wav2Vec2, XGBoost, and SHAP--LIME explainability, aims to address these limitations by providing accurate early dyslexia risk screening, transparent AI-driven decision support, personalized reading intervention, and continuous progress monitoring through an accessible smartphone-based platform. This integrated approach has the potential to improve screening accuracy, enhance user trust through explainable predictions, and support parents, teachers, and educational professionals in delivering timely and personalized educational interventions for children at risk of dyslexia.
+
+\section{Proposed Methodology}
+The proposed system aims to develop a CNN--LSTM Multimodal Deep Learning Framework Integrating Smartphone-Based Eye-Gaze Tracking, Speech Intelligence, and SHAP--LIME Explainability for Early Dyslexia Risk Screening and Personalized Reading Intervention in Pediatric Populations. The framework leverages multimodal artificial intelligence to analyze reading behavior by combining smartphone-based eye-gaze tracking, speech intelligence, reading performance, cognitive assessment, and behavioral features to provide accurate, transparent, and personalized dyslexia risk screening. Unlike conventional screening approaches that depend on specialized eye-tracking equipment and expert assessment, the proposed framework utilizes widely available smartphone sensors and advanced deep learning techniques to create an accessible educational decision-support platform.
+
+Initially, children perform a guided reading assessment through a Flutter-based mobile application, where reading passages, word recognition tasks, pronunciation exercises, and cognitive games are presented according to age-appropriate difficulty levels. During the assessment, the smartphone's front-facing camera continuously captures facial landmarks and eye movements, while the microphone records the child's speech during oral reading activities. Parent questionnaires and demographic information are also collected to provide additional contextual information for personalized risk assessment.
+
+The captured video frames undergo preprocessing using OpenCV, including face detection, image resizing, normalization, illumination correction, and noise reduction. Subsequently, MediaPipe Face Mesh detects facial landmarks and iris positions to estimate eye-gaze trajectories, fixation duration, saccadic eye movements, blink rate, and reading regressions. These eye-gaze characteristics serve as important visual biomarkers associated with dyslexia-related reading difficulties.
+
+Simultaneously, the recorded speech is preprocessed using noise reduction, silence removal, and audio normalization techniques. Whisper is employed for automatic speech transcription, while Wav2Vec2 extracts high-level speech representations related to pronunciation accuracy, phonological awareness, reading fluency, speaking rate, hesitation patterns, and word omissions. Reading performance metrics such as reading speed, reading accuracy, pause frequency, and pronunciation errors are further computed to characterize the child's reading behavior.
+
+The extracted multimodal data are processed using a CNN--LSTM deep learning architecture. The Convolutional Neural Network (CNN) automatically learns discriminative spatial representations from eye-gaze heatmaps, facial landmark distributions, and reading behavior visualizations. These spatial features are subsequently provided to the Long Short-Term Memory (LSTM) network, which models temporal dependencies present in sequential eye movements, speech signals, and reading patterns. The integration of CNN and LSTM enables simultaneous learning of spatial and temporal characteristics, resulting in more comprehensive feature representations than either model individually.
+
+Following feature extraction, multimodal representations obtained from eye-gaze analysis, speech intelligence, reading assessment, cognitive games, and parent questionnaires are combined using a multimodal feature fusion strategy. The fused feature vector is subsequently classified using Extreme Gradient Boosting (XGBoost) to predict the child's dyslexia risk level, while Random Forest is implemented as a baseline model for comparative performance evaluation. The classification module generates a dyslexia risk score together with a confidence estimate to support educational decision-making.
+
+To enhance model transparency, the proposed framework integrates Explainable Artificial Intelligence (XAI) through SHAP (SHapley Additive exPlanations) and LIME (Local Interpretable Model-agnostic Explanations). SHAP provides global explanations by identifying the relative contribution of each multimodal feature to the overall prediction, whereas LIME generates local explanations for individual assessments, enabling parents, teachers, and educational professionals to understand the primary factors influencing each child's predicted risk level.
+
+Beyond early risk screening, the proposed framework incorporates a Personalized Reading Intervention Engine that automatically recommends adaptive reading exercises, phonics activities, pronunciation practice, vocabulary enhancement, and letter recognition tasks according to the child's learning profile. An integrated AI Reading Coach provides real-time pronunciation feedback and reading guidance during practice sessions. Furthermore, continuous progress monitoring records daily, weekly, and monthly learning performance through interactive parent and teacher dashboards, enabling longitudinal assessment of reading improvement and facilitating timely educational interventions.
+
+Finally, the framework automatically generates a comprehensive PDF assessment report summarizing the predicted dyslexia risk level, confidence score, eye-gaze analytics, speech intelligence results, explainable AI interpretations, reading performance metrics, personalized learning recommendations, and longitudinal progress trends. The proposed framework is designed to improve screening accuracy, enhance interpretability through explainable AI, support evidence-based educational decision-making, and provide scalable smartphone-based early dyslexia risk screening and personalized reading intervention for pediatric populations.
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox{0.9\linewidth}{\centering \vspace{20pt} [Proposed CNN--LSTM Multimodal Framework for Early Dyslexia Risk Screening] \vspace{20pt}}}
+\caption{Proposed CNN--LSTM multimodal framework for early dyslexia risk screening.}
+\label{fig:framework_arch}
+\end{figure}
+
+\section{Comparative Analysis}
+The comparative analysis of recent studies indicates that Artificial Intelligence (AI) and Deep Learning (DL) have significantly improved the early detection of dyslexia through eye-tracking, speech analysis, reading behavior assessment, and machine learning techniques. Most existing approaches employ individual deep learning models such as CNNs, LSTMs, or transformer-based architectures to analyze specific modalities, while some studies incorporate computer vision and speech processing to enhance screening accuracy. Explainable Artificial Intelligence (XAI) techniques such as SHAP and LIME have also been introduced to improve the transparency and interpretability of AI predictions.
+
+Despite these advancements, several limitations remain. Most existing systems rely on a single modality, such as eye-gaze tracking or speech analysis, which limits their ability to capture the complex characteristics of dyslexia. Furthermore, many approaches require specialized eye-tracking hardware, reducing their accessibility and scalability. Although explainability techniques have been explored, they are often implemented as standalone components rather than being integrated into a comprehensive educational decision-support framework. The proposed CNN--LSTM multimodal framework addresses these limitations by combining smartphone-based eye-gaze tracking, speech intelligence, cognitive assessment, multimodal feature fusion, and SHAP--LIME explainability to provide accurate, transparent, and personalized early dyslexia risk screening and intervention.
+
+\section{Expected Outcomes}
+The proposed CNN--LSTM Multimodal Deep Learning Framework is expected to provide an accurate, explainable, and accessible solution for early dyslexia risk screening by integrating smartphone-based eye-gaze tracking, speech intelligence, reading behavior analysis, and cognitive assessment. By combining multiple modalities, the framework is anticipated to improve prediction accuracy and robustness compared to conventional single-modality screening approaches.
+
+The integration of SHAP and LIME is expected to enhance the transparency of AI predictions by providing both global and local explanations, thereby increasing the confidence of parents, teachers, and educational professionals in AI-assisted educational decision-making. Furthermore, the proposed system aims to generate personalized reading recommendations, adaptive learning activities, and continuous progress monitoring through interactive parent and teacher dashboards. Overall, the framework is expected to support early identification of children at risk of dyslexia, facilitate timely educational intervention, and improve long-term reading outcomes through an intelligent, scalable, and user-friendly mobile platform.
+
+\section{Conclusion}
+This paper reviewed recent advancements in Artificial Intelligence, multimodal deep learning, smartphone-based eye-gaze tracking, speech intelligence, and Explainable Artificial Intelligence (XAI) for early dyslexia risk screening. Although existing studies have demonstrated promising prediction performance, many rely on single-modality approaches, require specialized hardware, or provide limited interpretability and personalized educational support.
+
+To address these limitations, a CNN--LSTM Multimodal Deep Learning Framework integrating smartphone-based eye-gaze tracking, speech intelligence, multimodal feature fusion, and SHAP--LIME explainability has been proposed. The framework is expected to improve dyslexia risk prediction by combining multiple behavioral indicators while providing transparent AI-assisted educational decision support. Furthermore, the integration of personalized reading intervention and continuous progress monitoring aims to facilitate timely educational support and improve long-term reading outcomes.
+
+By combining multimodal deep learning with Explainable AI, the proposed framework has the potential to enhance the accessibility, reliability, and practical adoption of AI-assisted dyslexia screening. Future work will focus on implementing the proposed framework, evaluating its performance on publicly available benchmark datasets, and comparing it with existing state-of-the-art dyslexia screening approaches.
+
+\begin{thebibliography}{00}
+\bibitem{b1} I. Vajs, T. Papi\'c, V. Kovi\'c, A. M. Savi\'c, and M. M. Jankovi\'c, ``Accessible Dyslexia Detection with Real-Time Reading Feedback through Robust Interpretable Eye-Tracking Features,'' \textit{Brain Sciences}, vol. 13, no. 3, Art. no. 405, 2023, doi: 10.3390/brainsci13030405.
+
+\bibitem{b2} S. Shalileh, D. Ignatov, A. Lopukhina, and O. Dragoy, ``Identifying Dyslexia in School Pupils from Eye Movement and Demographic Data Using Artificial Intelligence,'' \textit{PLOS ONE}, vol. 18, no. 11, e0292047, 2023, doi: 10.1371/journal.pone.0292047.
+
+\bibitem{b3} H. W. Liu, S. Wang, and S. X. Tong, ``DysDiTect: Dyslexia Identification Using CNN-Positional-LSTM-Attention Modeling with Chinese Dictation Task,'' \textit{Brain Sciences}, vol. 14, no. 5, Art. no. 444, 2024, doi: 10.3390/brainsci14050444.
+
+\bibitem{b4} Z. Gomolka, E. Zeslawska, B. Czuba, and Y. Kondratenko, ``Diagnosing Dyslexia in Early School-Aged Children Using the LSTM Network and Eye Tracking Technology,'' \textit{Applied Sciences}, vol. 14, no. 17, Art. no. 8004, 2024, doi: 10.3390/app14178004.
+
+\bibitem{b5} A. J. Prabha and R. Bhargavi, ``Prediction of Dyslexia Severity Levels from Fixation and Saccadic Eye Movement Using Machine Learning,'' \textit{Biomedical Signal Processing and Control}, vol. 79, 2023, Art. no. 104094, doi: 10.1016/j.bspc.2022.104094.
+
+\bibitem{b6} R. Srinivasan et al., ``Detection of Reading Impairment from Eye-Gaze Behaviour Using Reinforcement Learning,'' \textit{Procedia Computer Science}, vol. 218, pp. 2734--2743, 2023, doi: 10.1016/j.procs.2023.01.245.
+
+\bibitem{b7} A. Vaswani et al., ``Attention Is All You Need,'' in \textit{Proc. Advances in Neural Information Processing Systems (NeurIPS)}, 2017.
+
+\bibitem{b8} A. Radford et al., ``Robust Speech Recognition via Large-Scale Weak Supervision,'' OpenAI, 2022. (Whisper Model)
+
+\bibitem{b9} A. Baevski, H. Zhou, A. Mohamed, and M. Auli, ``wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations,'' in \textit{Proc. Advances in Neural Information Processing Systems (NeurIPS)}, 2020.
+
+\bibitem{b10} S. M. Lundberg and S.-I. Lee, ``A Unified Approach to Interpreting Model Predictions,'' in \textit{Proc. Advances in Neural Information Processing Systems (NeurIPS)}, 2017.
+
+\bibitem{b11} M. T. Ribeiro, S. Singh, and C. Guestrin, ``Why Should I Trust You? Explaining the Predictions of Any Classifier,'' in \textit{Proc. ACM SIGKDD International Conference on Knowledge Discovery and Data Mining}, 2016, pp. 1135--1144.
+
+\bibitem{b12} T. Chen and C. Guestrin, ``XGBoost: A Scalable Tree Boosting System,'' in \textit{Proc. ACM SIGKDD International Conference on Knowledge Discovery and Data Mining}, 2016, pp. 785--794.
+
+\bibitem{b13} K. He, X. Zhang, S. Ren, and J. Sun, ``Deep Residual Learning for Image Recognition,'' in \textit{Proc. IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, 2016, pp. 770--778.
+
+\bibitem{b14} S. Hochreiter and J. Schmidhuber, ``Long Short-Term Memory,'' \textit{Neural Computation}, vol. 9, no. 8, pp. 1735--1780, 1997.
+
+\bibitem{b15} F. Pedregosa et al., ``Scikit-learn: Machine Learning in Python,'' \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825--2830, 2011.
+\end{thebibliography}
+
+\end{document}
