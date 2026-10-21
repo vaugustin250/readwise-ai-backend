@@ -61,12 +61,12 @@ Recent artificial intelligence (AI) screening models present notable shortcoming
     \item \textit{Lack of Intervention:} Prior systems terminate at binary risk prediction without offering personalized reading remediation.
 \end{enumerate}
 
-To address these challenges, this paper presents **ReadWise AI**, an accessible, multimodal, explainable framework deployed on commodity smartphones. The main contributions are:
+To address these challenges, this paper presents \textbf{ReadWise AI}, an accessible, multimodal, explainable framework deployed on commodity smartphones. The main contributions are:
 \begin{itemize}
     \item \textbf{Accessible Multimodal Capture:} Synchronized acquisition of ocular tracking (via MediaPipe Face Mesh on RGB camera), speech acoustics (via mobile microphone), and cognitive interaction metrics without external hardware.
-    \item \textbf{Gamified Anxiety Mitigation:} A child-centric interface featuring 3D tactile push elements, warm cream backgrounds (`\#FFFDF5`), and animated companions (Doraemon, Ben 10, Hattori, Bheem) that eliminate test anxiety.
+    \item \textbf{Gamified Anxiety Mitigation:} A child-centric interface featuring 3D tactile push elements, warm cream backgrounds (\#FFFDF5), and animated companions (Doraemon, Ben 10, Hattori, Bheem) that eliminate test anxiety.
     \item \textbf{Spatial-Temporal CNN--LSTM Modeling:} A dual-stream deep architecture fusing 2D spatial gaze density maps with sequential temporal reading and speech feature representations.
-    \item \textbf{Dual-Tier Explainability & Intervention:} Global Tree-SHAP and local LIME explanations coupled with an automated decision-support engine that generates individualized phonics plans and clinical PDF reports.
+    \item \textbf{Dual-Tier Explainability and Intervention:} Global Tree-SHAP and local LIME explanations coupled with an automated decision-support engine that generates individualized phonics plans and clinical PDF reports.
 \end{itemize}
 
 \begin{figure*}[t]
@@ -77,18 +77,17 @@ To address these challenges, this paper presents **ReadWise AI**, an accessible,
 \end{figure*}
 
 \section{Related Work}
-\subsection{Ocular & Acoustic Biomarkers}
+\subsection{Ocular and Acoustic Biomarkers}
 Eye movements during text reading provide quantitative markers of cognitive processing. Typical readers show forward saccades (7--9 letters), fixations of 200--250 ms, and minimal regressions (10--15\%) \cite{b1}. Dyslexic readers exhibit prolonged fixations ($>350$ ms), abbreviated saccades, and frequent regressive saccades ($>30\%$) due to decoding confusion \cite{b5}, \cite{b6}. Vajs et al. \cite{b1} achieved 86.4\% accuracy using eye-tracking, but mandated clinical EyeLink hardware. Shalileh et al. \cite{b2} utilized machine learning on Tobii gaze data with demographic profiles. In speech intelligence, Wav2Vec 2.0 \cite{b9} and Whisper \cite{b8} capture phonetic hesitation latencies and speaking rate disfluencies. However, unimodal architectures fail to capture cross-modal compensatory reading strategies.
 
-\subsection{Explainable AI & Pediatric Decision Support}
+\subsection{Explainable AI and Pediatric Decision Support}
 Applying deep learning to pediatric diagnostics requires verifiable transparency. Lundberg and Lee \cite{b10} formalized SHAP, allocating additive feature contributions based on cooperative game theory. Ribeiro et al. \cite{b11} formulated LIME to construct local surrogate linear models around specific instances. Combining SHAP with LIME allows clinicians to verify global biomarker validity while inspecting patient-specific risk factors. Table \ref{tab:lit_comparison} contrasts existing studies against our proposed framework.
 
 \begin{table}[t]
 \centering
 \caption{Comparison with State-of-the-Art Dyslexia Screening}
 \label{tab:lit_comparison}
-\setlength{\tabcolsep}{2.5pt}
-\scriptsize
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{@{}lllll@{}}
 \toprule
 \textbf{Study} & \textbf{Modalities} & \textbf{Sensory Hardware} & \textbf{XAI Layer} & \textbf{Accuracy / AUC} \\ \midrule
@@ -98,7 +97,8 @@ Prabha et al. \cite{b5} & Eye movements & SMI RED250 (Infrared) & None & 85.7\% 
 Gomolka et al. \cite{b4} & Eye tracking & Tobii Pro Glasses & None & 89.1\% / 0.902 \\
 Liu et al. (2024) \cite{b3} & Dictation/Draw & Digital Tablet & Post-hoc & 91.2\% / 0.918 \\
 \textbf{ReadWise AI} & \textbf{Gaze+Speech+Cog} & \textbf{Smartphone Cam+Mic} & \textbf{SHAP+LIME} & \textbf{93.8\% / 0.946} \\ \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \section{Proposed System Architecture}
@@ -113,7 +113,7 @@ Gaze velocity $v(t) = \|\vec{g}(t) - \vec{g}(t - \Delta t)\|_2 / \Delta t$ categ
 R_{\text{reg}} = \frac{N_{\text{regressive}}}{N_{\text{progressive}} + N_{\text{regressive}}}
 \end{equation}
 
-\subsection{Speech Acoustics & Cognitive Formulations}
+\subsection{Speech Acoustics and Cognitive Formulations}
 Simultaneously, oral audio $s(t)$ sampled at 16 kHz yields 80-bin log-mel spectrograms $\mathbf{S}_{\text{mel}}$ and Wav2Vec 2.0 embeddings $\mathbf{z}(t) \in \mathbb{R}^{768}$. Key metrics include Words Per Minute $\text{WPM} = \frac{N_{\text{words}}}{T_{\text{read}}} \times 60$, Pause Latency Ratio $P_{\text{ratio}} = \frac{1}{T} \int_{0}^T \mathbb{I}(E(t) < \gamma) dt$, and phonetic hesitation counts. Cognitive tasks record reaction latency and mirror-letter error rates ($b$ vs. $d$).
 
 \subsection{CNN--LSTM Spatial-Temporal Fusion}
@@ -125,7 +125,7 @@ Fixation coordinates are mapped into a 2D spatial heatmap $\mathbf{M}_{\text{gaz
 \end{align}
 The final representation fuses spatial, temporal, cognitive, and demographic vectors: $\mathbf{X}_{\text{fused}} = [\mathbf{e}_{\text{spatial}} \parallel \mathbf{h}_T \parallel \mathbf{e}_{\text{cog}} \parallel \mathbf{e}_{\text{demo}}]$.
 
-\subsection{Ensemble Classification & XAI Formulation}
+\subsection{Ensemble Classification and XAI Formulation}
 An Extreme Gradient Boosting (XGBoost) ensemble optimizes regularized objective $\mathcal{L}^{(m)} = \sum_{i=1}^n l(y_i, \hat{y}_i^{(m-1)} + f_m(\mathbf{x}_i)) + \Omega(f_m)$, stratifying risk into Low ($<0.35$), Moderate ($0.35$--$0.70$), and High ($\ge 0.70$).
 Global feature importance is evaluated via Tree-SHAP:
 \begin{equation}
@@ -143,10 +143,10 @@ Local per-subject transparency is computed via LIME surrogate:
 \label{fig:app_screens}
 \end{figure*}
 
-\section{Mobile Interface & Pediatric Anxiety Mitigation}
+\section{Mobile Interface and Pediatric Anxiety Mitigation}
 Standard pediatric screening frequently induces ``white-coat'' performance apprehension. As shown in the real app screenshots in Fig. \ref{fig:app_screens}, ReadWise AI integrates specific design choices to preserve ecological validity:
 \begin{itemize}
-    \item \textbf{Scotopic Visual Palette:} Warm cream canvas (`\#FFFDF5`) with dark slate text (`\#1E293B`) minimizes visual stress and glare.
+    \item \textbf{Scotopic Visual Palette:} Warm cream canvas (\#FFFDF5) with dark slate text (\#1E293B) minimizes visual stress and glare.
     \item \textbf{Tactile 3D Claymorphic Controls:} Dual-shadow extruded buttons with push-down physics provide immediate tactile feedback.
     \item \textbf{Companion Roster:} Children choose reading companions (Doraemon Azure, Ben 10 Lime, Hattori Cobalt, Bheem Saffron) that deliver spoken encouragement throughout the tasks.
     \item \textbf{Passive Hardware Telemetry:} Gaze and audio tracking run unobtrusively in background threads during natural interaction.
@@ -170,8 +170,7 @@ Standard pediatric screening frequently induces ``white-coat'' performance appre
 \centering
 \caption{5-Fold Stratified Cross-Validation Benchmark Results}
 \label{tab:performance}
-\setlength{\tabcolsep}{2.5pt}
-\scriptsize
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{@{}lccccc@{}}
 \toprule
 \textbf{Model / Modality} & \textbf{Acc (\%)} & \textbf{Sens (\%)} & \textbf{Spec (\%)} & \textbf{F1 (\%)} & \textbf{AUC} \\ \midrule
@@ -182,7 +181,8 @@ Unimodal Gaze (Front Camera) & 81.6$\pm$1.9 & 83.0$\pm$2.2 & 80.2$\pm$2.0 & 81.5
 Random Forest (Fused Multimodal)& 87.5$\pm$1.4 & 88.0$\pm$1.6 & 87.0$\pm$1.5 & 87.5$\pm$1.4 & 0.882 \\
 CNN-LSTM (Direct Dense) & 89.2$\pm$1.3 & 89.8$\pm$1.5 & 88.6$\pm$1.4 & 89.2$\pm$1.3 & 0.908 \\
 \textbf{Proposed (CNN--LSTM+XGB)} & \textbf{93.8$\pm$1.1} & \textbf{94.2$\pm$1.2} & \textbf{93.4$\pm$1.1} & \textbf{93.8$\pm$1.1} & \textbf{0.946} \\ \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure*}[t]
@@ -192,23 +192,23 @@ CNN-LSTM (Direct Dense) & 89.2$\pm$1.3 & 89.8$\pm$1.5 & 88.6$\pm$1.4 & 89.2$\pm$
 \label{fig:xai_combined}
 \end{figure*}
 
-\section{Experimental Evaluation & Results}
-\subsection{Dataset & Validation Protocol}
+\section{Experimental Evaluation and Results}
+\subsection{Dataset and Validation Protocol}
 Experiments utilized the ETDD-70 pediatric benchmark dataset (70 subjects: 35 diagnosed dyslexic, 35 control) \cite{b1} alongside synchronized smartphone multimodal validation cohorts. Subject-disjoint splits ensured zero data leakage between training and testing folds. Continuous variables were standardized using training-fold scalers.
 
 \subsection{Performance Benchmarks}
 As detailed in Table \ref{tab:performance} and Fig. \ref{fig:roc}, the proposed framework achieved:
 \begin{itemize}
-    \item \textbf{Accuracy:} **93.8\% $\pm$ 1.1\%**, outperforming Random Forest by +6.3\% and unimodal gaze by +12.2\%.
-    \item \textbf{Sensitivity:} **94.2\% $\pm$ 1.2\%**, minimizing critical false-negative screening omissions.
-    \item \textbf{Specificity:} **93.4\% $\pm$ 1.1\%**, ensuring high resistance against false alarms.
-    \item \textbf{AUC-ROC:} **0.946**, confirming robust threshold discrimination.
+    \item \textbf{Accuracy:} 93.8\% $\pm$ 1.1\%, outperforming Random Forest by +6.3\% and unimodal gaze by +12.2\%.
+    \item \textbf{Sensitivity:} 94.2\% $\pm$ 1.2\%, minimizing critical false-negative screening omissions.
+    \item \textbf{Specificity:} 93.4\% $\pm$ 1.1\%, ensuring high resistance against false alarms.
+    \item \textbf{AUC-ROC:} 0.946, confirming robust threshold discrimination.
 \end{itemize}
 
 Ocular scanpaths in Fig. \ref{fig:scanpath} illustrate the high regression rates and prolonged fixations characteristic of reading difficulties. The significant advantage of the multimodal architecture over unimodal baselines (Gaze AUC: 0.824, Speech AUC: 0.791) demonstrates that ocular tracking and speech acoustics provide complementary diagnostic signal.
 
-\section{Explainable AI & Adaptive Intervention}
-\subsection{Global & Local XAI Insights}
+\section{Explainable AI and Adaptive Intervention}
+\subsection{Global and Local XAI Insights}
 Fig. \ref{fig:xai_combined} presents both global SHAP attributions and local LIME explanations:
 \begin{enumerate}
     \item \textbf{Saccadic Regressions (SHAP = 0.38):} The primary predictor; dyslexic readers exhibit elevated regressions per line during phonological decoding.
@@ -220,7 +220,7 @@ Fig. \ref{fig:xai_combined} presents both global SHAP attributions and local LIM
 \subsection{Personalized Intervention Engine}
 ReadWise AI translates LIME attributions into targeted remediation: children with high letter reversal errors receive tactile orientation tracing; those with high pause latency receive phonemic blending; and those with high regressions receive rapid serial visual presentation (RSVP) pacing. Multi-page clinical PDF reports are compiled automatically for pediatricians and educators.
 
-\section{Ethics, Privacy, & Clinical Scope}
+\section{Ethics, Privacy, and Clinical Scope}
 \begin{itemize}
     \item \textbf{Screening Scope:} ReadWise AI provides early \textit{screening estimates and educational decision support}; it does not issue autonomous clinical diagnoses.
     \item \textbf{Pediatric Data Privacy:} Under COPPA and GDPR-Kids, raw video and audio are processed ephemerally in on-device memory; only anonymous derived telemetry vectors are stored.
