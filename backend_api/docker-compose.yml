@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: readwise_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: dyslexia_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d dyslexia_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: backend_api/Dockerfile
+    container_name: readwise_api
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@db:5432/dyslexia_db
+      - SECRET_KEY=production_readwise_secret_key_change_in_env
+      - ENVIRONMENT=production
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../ai_engine/models/saved_models:/app/ai_engine/models/saved_models:ro
+
+volumes:
+  postgres_data:

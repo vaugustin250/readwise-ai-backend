@@ -1,0 +1,31 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Local databases and logs
+*.db
+*.sqlite3
+*.log
+.env
+
+# Raw heavy training datasets (Zenodo data.zip etc)
+ai_engine/data/
+*.zip
+
+# Mobile build output (already compiled locally)
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
